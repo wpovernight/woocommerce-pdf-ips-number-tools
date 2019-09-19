@@ -1,0 +1,11 @@
+.wcpdf-invoice-number-store td,
+.wcpdf-invoice-number-store th {
+	background: white;
+	padding: 8px;
+	border: 1px solid #ccc;
+}
+.wcpdf-invoice-number-store {
+	margin-top: 5px;
+	border-collapse: collapse;
+	border-spacing: 0;	
+}
