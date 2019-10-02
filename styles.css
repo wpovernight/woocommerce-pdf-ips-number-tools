@@ -9,3 +9,43 @@
 	border-collapse: collapse;
 	border-spacing: 0;	
 }
+
+.wpo-wcpdf-number-tools th,
+.wpo-wcpdf-number-tools td { 
+	border-bottom:1px solid #ccc;
+	padding:2em 2em 3em 0;
+}
+
+.wpo-wcpdf-number-tools th {
+	text-align:left;
+	width:70%;
+	font-weight:normal;
+}
+
+.wpo-wcpdf-number-tools strong {
+	color:#a00;
+	font-weight:bold;
+}
+
+.wpo-wcpdf-number-tools strong.name {
+	font-size:1.2em;
+	color:#222;
+	padding:1em 0 0.4em 0;
+	display:block;
+}
+
+.wpo-wcpdf-number-tools .description {
+	font-style:normal;
+	color:#333;
+}
+
+.wpo-wcpdf-number-tools .warning {
+	font-style:italic;
+	color:#666;
+	margin-top:2em;
+	padding:1em 1.4em;
+	background:#eaeaea;
+	border:1px solid #222;
+	display:inline-block;
+}
+

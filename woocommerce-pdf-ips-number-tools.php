@@ -49,7 +49,7 @@ class WPO_WCPDF_Number_Tools {
 			$active_section = 'tools';
 		}
 		$sections = [
-			// 'tools'           => __('Tools'),
+			'tools'           => __('Tools'),
 			'invoice_numbers' => __('Invoice Numbers'),
 		];
 		?>
@@ -66,8 +66,8 @@ class WPO_WCPDF_Number_Tools {
 		switch ( $active_section ) {
 			case 'tools':
 			default:
-				// echo "Toooooools!";
-				// break;
+				$this->number_tools();
+				break;
 			case 'invoice_numbers':
 				$this->number_store_overview( 'invoice_number');
 				break;
@@ -104,6 +104,81 @@ class WPO_WCPDF_Number_Tools {
 		}
 		echo '</table>';
 
+	}
+
+	public function number_tools() {
+		echo '<style type="text/css">';
+		include( plugin_dir_path( __FILE__ ) . 'styles.css' );
+		echo '</style>';
+		?>
+		<table class="wpo-wcpdf-number-tools">
+			<tr class="renumber-invoices">
+				<th>
+					<strong class="name">Renumber existing PDF invoices</strong>
+					<p class="description">This tool will renumber existing PDF invoices, while keeping the assigned invoice date. Set the "next invoice number" setting to the number you want to use for the first invoice. Note that this process may need to run longer than your server supports, so it is advisable to do this in smaller batches (adjust the date range in the source of the snippet for this tool).</p>
+					<p class="warning"><strong>IMPORTANT:</strong> Create a backup before using this tool, the actions it performs are irreversable!</p>
+				</th>
+				<td class="run-tool">
+					<a href="" class="button button-large">Renumber invoices</a>
+				</td>
+			</tr>
+			<tr class="renumber-invoices">
+				<th>
+					<strong class="name">Delete existing PDF invoices</strong>
+					<p class="description">This tool will delete existing PDF invoices. Note that this process may need to run longer than your server supports, so it is advisable to do this in smaller batches (adjust the date range in the source of the snippet for this tool).</p>
+					<p class="warning"><strong>IMPORTANT:</strong> Create a backup before using this tool, the actions it performs are irreversable!</p>
+				</th>
+				<td class="run-tool">
+					<a href="" class="button button-large">Delete invoices</a>
+				</td>
+			</tr>
+		</table>
+		<?php
+	}
+
+	public function wpo_wcpdf_renumber_invoices() {
+		$args = array(
+			'return'		=> 'ids',
+			'type'			=> 'shop_order',
+			'limit'			=> -1,
+			'order'			=> 'ASC',
+			'date_created'	=> '2018-10-01...2018-12-31',
+		);
+		$order_ids = wc_get_orders( $args );
+		$invoice_count = 0;
+		foreach ($order_ids as $order_id) {
+			$order = wc_get_order( $order_id );
+			if ( $invoice = wcpdf_get_invoice( $order ) ) {
+				if ( $invoice->exists() ) {
+					$invoice->init_number();
+					$invoice->save();
+					$invoice_count++;
+				}
+			}
+		}
+		return "{$invoice_count} invoices renumbered.";
+	}
+
+	public function wpo_wcpdf_delete_invoices() {
+		$args = array(
+			'return'		=> 'ids',
+			'type'			=> 'shop_order',
+			'limit'			=> -1,
+			'order'			=> 'ASC',
+			'date_created'	=> '2018-10-01...2018-12-31',
+		);
+		$order_ids = wc_get_orders( $args );
+		$invoice_count = 0;
+		foreach ($order_ids as $order_id) {
+			$order = wc_get_order( $order_id );
+			if ( $invoice = wcpdf_get_invoice( $order ) ) {
+				if ( $invoice->exists() ) {
+					$invoice->delete();
+					$invoice_count++;
+				}
+			}
+		}
+		return "{$invoice_count} invoices deleted.";
 	}
 }
 
