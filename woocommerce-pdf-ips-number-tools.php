@@ -111,28 +111,51 @@ class WPO_WCPDF_Number_Tools {
 		include( plugin_dir_path( __FILE__ ) . 'styles.css' );
 		echo '</style>';
 		?>
-		<table class="wpo-wcpdf-number-tools">
-			<tr class="renumber-invoices">
-				<th>
-					<strong class="name">Renumber existing PDF invoices</strong>
-					<p class="description">This tool will renumber existing PDF invoices, while keeping the assigned invoice date. Set the "next invoice number" setting to the number you want to use for the first invoice. Note that this process may need to run longer than your server supports, so it is advisable to do this in smaller batches (adjust the date range in the source of the snippet for this tool).</p>
-					<p class="warning"><strong>IMPORTANT:</strong> Create a backup before using this tool, the actions it performs are irreversable!</p>
-				</th>
-				<td class="run-tool">
-					<a href="" class="button button-large">Renumber invoices</a>
-				</td>
-			</tr>
-			<tr class="renumber-invoices">
-				<th>
-					<strong class="name">Delete existing PDF invoices</strong>
-					<p class="description">This tool will delete existing PDF invoices. Note that this process may need to run longer than your server supports, so it is advisable to do this in smaller batches (adjust the date range in the source of the snippet for this tool).</p>
-					<p class="warning"><strong>IMPORTANT:</strong> Create a backup before using this tool, the actions it performs are irreversable!</p>
-				</th>
-				<td class="run-tool">
-					<a href="" class="button button-large">Delete invoices</a>
-				</td>
-			</tr>
-		</table>
+		<div class="wpo-wcpdf-number-tools">
+
+			<div class="renumber-invoices">
+				<strong class="name">Renumber existing PDF invoices</strong>
+				<p class="description">This tool will renumber existing PDF invoices, while keeping the assigned invoice date. Set the "next invoice number" setting to the number you want to use for the first invoice. Note that this process may need to run longer than your server supports, so it is advisable to do this in smaller batches (adjust the date range in the source of the snippet for this tool).</p>
+				
+				<div class="date-range">
+					<span>From:</span>
+					<input type="text" id="date-from" name="date-from" value="2019-09-30" size="10">@
+					<input type="text" class="hour" placeholder="h" name="hour-from" id="hour-from" maxlength="2" size="2" value="19" pattern="([01]?[0-9]{1}|2[0-3]{1})">:<input type="text" class="minute" placeholder="m" name="minute-from" id="minute-from" maxlength="2" size="2" value="56" pattern="[0-5]{1}[0-9]{1}">
+				</div>
+
+				<div class="date-range">
+					<span>To:</span>
+					<input type="text" id="date-to" name="date-to" value="2019-10-02" size="10">@
+					<input type="text" class="hour" placeholder="h" name="hour-to" id="hour-to" maxlength="2" size="2" value="17" pattern="([01]?[0-9]{1}|2[0-3]{1})">:<input type="text" class="minute" placeholder="m" name="minute-to" id="minute-to" maxlength="2" size="2" value="37" pattern="[0-5]{1}[0-9]{1}">
+				</div>
+
+				<a href="" class="button button-large renumber-invoices">Renumber invoices</a>
+
+				<p class="warning"><strong>IMPORTANT:</strong> Create a backup before using this tool, the actions it performs are irreversable!</p>
+			</div>
+
+			<div class="delete-invoices">
+				<strong class="name">Delete existing PDF invoices</strong>
+				<p class="description">This tool will delete existing PDF invoices. Note that this process may need to run longer than your server supports, so it is advisable to do this in smaller batches (adjust the date range in the source of the snippet for this tool).</p>
+
+				<div class="date-range">
+					<span>From:</span>
+					<input type="text" id="date-from" name="date-from" value="2019-09-30" size="10">@
+					<input type="text" class="hour" placeholder="h" name="hour-from" id="hour-from" maxlength="2" size="2" value="19" pattern="([01]?[0-9]{1}|2[0-3]{1})">:<input type="text" class="minute" placeholder="m" name="minute-from" id="minute-from" maxlength="2" size="2" value="56" pattern="[0-5]{1}[0-9]{1}">
+				</div>
+
+				<div class="date-range">
+					<span>To:</span>
+					<input type="text" id="date-to" name="date-to" value="2019-10-02" size="10">@
+					<input type="text" class="hour" placeholder="h" name="hour-to" id="hour-to" maxlength="2" size="2" value="17" pattern="([01]?[0-9]{1}|2[0-3]{1})">:<input type="text" class="minute" placeholder="m" name="minute-to" id="minute-to" maxlength="2" size="2" value="37" pattern="[0-5]{1}[0-9]{1}">
+				</div>
+
+				<a href="" class="button button-large delete-invoices">Delete invoices</a>
+
+				<p class="warning"><strong>IMPORTANT:</strong> Create a backup before using this tool, the actions it performs are irreversable!</p>
+			</div>
+
+		</div>
 		<?php
 	}
 

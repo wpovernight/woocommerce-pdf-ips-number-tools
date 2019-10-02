@@ -10,16 +10,17 @@
 	border-spacing: 0;	
 }
 
-.wpo-wcpdf-number-tools th,
-.wpo-wcpdf-number-tools td { 
-	border-bottom:1px solid #ccc;
-	padding:2em 2em 3em 0;
+.wpo-wcpdf-number-tools {
+	text-align:left;
+	width:100%;
+	font-weight:normal;
 }
 
-.wpo-wcpdf-number-tools th {
-	text-align:left;
+.wpo-wcpdf-number-tools .renumber-invoices,
+.wpo-wcpdf-number-tools .delete-invoices { 
+	border-bottom:1px solid #ccc;
+	padding:2em 2em 3em 0;
 	width:70%;
-	font-weight:normal;
 }
 
 .wpo-wcpdf-number-tools strong {
@@ -37,15 +38,30 @@
 .wpo-wcpdf-number-tools .description {
 	font-style:normal;
 	color:#333;
+	padding-bottom:2em;
 }
 
 .wpo-wcpdf-number-tools .warning {
 	font-style:italic;
 	color:#666;
-	margin-top:2em;
+	margin-top:4em;
 	padding:1em 1.4em;
 	background:#eaeaea;
 	border:1px solid #222;
+}
+
+.wpo-wcpdf-number-tools a.button {
+	margin:2em 0 0 0;
+	display:inline-block;
+	width:auto;
+}
+
+.wpo-wcpdf-number-tools .date-range {
+	padding:0.5em 0;
+}
+
+.wpo-wcpdf-number-tools .date-range span {
+	width:45px;
 	display:inline-block;
 }
 
