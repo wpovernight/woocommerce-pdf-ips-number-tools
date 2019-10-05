@@ -37,6 +37,8 @@ class WPO_WCPDF_Number_Tools {
 	public function __construct() {
 		add_filter( 'wpo_wcpdf_settings_tabs', array( $this, 'number_tools_tab' ), 10, 1);
 		add_action( 'wpo_wcpdf_settings_output_number_tools', array( $this, 'number_tools_page' ), 10, 1);
+		add_action( 'wp_ajax_renumber_invoices', 'wpo_wcpdf_renumber_invoices' );
+		add_action( 'wp_ajax_delete_invoices', 'wpo_wcpdf_delete_invoices' );
 	}
 
 	public function number_tools_tab( $tabs ) {
@@ -108,12 +110,44 @@ class WPO_WCPDF_Number_Tools {
 
 	public function number_tools() {
 		echo '<style type="text/css">';
-		include( plugin_dir_path( __FILE__ ) . 'styles.css' );
+		include( plugin_dir_path( __FILE__ ) . 'css/styles.css' );
 		echo '</style>';
 		?>
+		<script type="text/javascript" >
+		jQuery(document).ready(function($) {
+			$( "#renumber-date-from, #renumber-date-to, #delete-date-from, #delete-date-to" ).datepicker({ dateFormat: 'yy-mm-dd' });
+
+			$('.renumber-invoices-btn').click(function() {
+				let renumberFrom = $('#renumber-date-from').val();
+				let renumberTo = $('#renumber-date-to').val();
+				let data = {
+					'action': 'renumber_invoices',
+					'renumber_from': renumberFrom,
+					'renumber_to': renumberTo
+				};
+				jQuery.post(ajaxurl, data, function(response) {
+					alert(response);
+				});
+			});
+
+			$('.delete-invoices-btn').click(function() {
+				let deleteFrom = $('#delete-date-from').val();
+				let deleteTo = $('#delete-date-to').val();
+				let data = {
+					'action': 'delete_invoices',
+					'delete_from': deleteFrom,
+					'delete_to': deleteTo
+				};
+				jQuery.post(ajaxurl, data, function(response) {
+					alert(response);
+				});
+			});
+		});
+		</script> 
+
 		<div class="wpo-wcpdf-number-tools">
 
-			<form>
+			<form id="number-tools" >
 
 				<div class="renumber-invoices">
 					<strong class="name">Renumber existing PDF invoices</strong>
@@ -121,15 +155,15 @@ class WPO_WCPDF_Number_Tools {
 					
 						<div class="date-range">
 							<span>From:</span>
-							<input type="text" id="renumber-date-from" name="renumber-date-from" value="<?php echo date('Y-m-d'); ?>" size="10">
+							<input type="text" id="renumber-date-from" name="renumber-date-from" value="<?php echo date('Y-m-d'); ?>" size="10"><span class="add-info">(as: yyyy-mm-dd)</span>
 						</div>
 
 						<div class="date-range">
 							<span>To:</span>
-							<input type="text" id="renumber-date-to" name="renumber-date-to" value="<?php echo date('Y-m-d'); ?>" size="10">
+							<input type="text" id="renumber-date-to" name="renumber-date-to" value="<?php echo date('Y-m-d'); ?>" size="10"><span class="add-info">(as: yyyy-mm-dd)</span>
 						</div>
 
-						<a href="" class="button button-large renumber-invoices">Renumber invoices</a>
+						<span class="button button-large renumber-invoices-btn">Renumber invoices</span>
 
 					<p class="warning"><strong>IMPORTANT:</strong> Create a backup before using this tool, the actions it performs are irreversable!</p>
 				</div>
@@ -140,15 +174,15 @@ class WPO_WCPDF_Number_Tools {
 
 					<div class="date-range">
 						<span>From:</span>
-						<input type="text" id="delete-date-from" name="delete-date-from" value="<?php echo date('Y-m-d'); ?>" size="10">
+						<input type="text" id="delete-date-from" name="delete-date-from" value="<?php echo date('Y-m-d'); ?>" size="10"><span class="add-info">(as: yyyy-mm-dd)</span>
 					</div>
 
 					<div class="date-range">
 						<span>To:</span>
-						<input type="text" id="delete-date-to" name="delete-date-to" value="<?php echo date('Y-m-d'); ?>" size="10"> (as year - month - day)
+						<input type="text" id="delete-date-to" name="delete-date-to" value="<?php echo date('Y-m-d'); ?>" size="10"><span class="add-info">(as: yyyy-mm-dd)</span>
 					</div>
 
-					<a href="" class="button button-large delete-invoices">Delete invoices</a>
+					<span class="button button-large delete-invoices-btn">Delete invoices</span>
 
 					<p class="warning"><strong>IMPORTANT:</strong> Create a backup before using this tool, the actions it performs are irreversable!</p>
 				</div>
@@ -158,14 +192,24 @@ class WPO_WCPDF_Number_Tools {
 		</div>
 		<?php
 	}
+}
 
-	public function wpo_wcpdf_renumber_invoices() {
+function wpo_wcpdf_renumber_invoices() {
+	$renumber_dates = array();
+	$message = '';
+	
+	$renumber_dates['renumber_from_date'] = explode('-', $_POST['renumber_from'] );
+	$renumber_dates['renumber_to_date'] = explode('-', $_POST['renumber_to'] );
+
+	$valid_dates = wpo_wcpdf_valid_dates( $renumber_dates );
+
+	if ( $valid_dates !== false ) {
 		$args = array(
 			'return'		=> 'ids',
 			'type'			=> 'shop_order',
 			'limit'			=> -1,
 			'order'			=> 'ASC',
-			'date_created'	=> '2018-10-01...2018-12-31',
+			'date_created'	=> $_POST['renumber_from'] . '...' . $_POST['renumber_to'],
 		);
 		$order_ids = wc_get_orders( $args );
 		$invoice_count = 0;
@@ -179,16 +223,31 @@ class WPO_WCPDF_Number_Tools {
 				}
 			}
 		}
-		return "{$invoice_count} invoices renumbered.";
+		$message = $invoice_count . ' invoices renumbered.';
+	} else {
+		$message = 'Invalid date(s) given!';
 	}
 
-	public function wpo_wcpdf_delete_invoices() {
+	echo $message;
+	wp_die(); // this is required to terminate immediately and return a proper response
+}
+
+function wpo_wcpdf_delete_invoices() {
+	$delete_dates = array();
+	$message = '';
+	
+	$delete_dates['delete_from_date'] = explode('-', $_POST['delete_from'] );
+	$delete_dates['delete_to_date'] = explode('-', $_POST['delete_to'] );
+
+	$valid_dates = wpo_wcpdf_valid_dates( $delete_dates );
+
+	if ( $valid_dates !== false ) {
 		$args = array(
 			'return'		=> 'ids',
 			'type'			=> 'shop_order',
 			'limit'			=> -1,
 			'order'			=> 'ASC',
-			'date_created'	=> '2018-10-01...2018-12-31',
+			'date_created'	=> $_POST['delete_from'] . '...' . $_POST['delete_to'],
 		);
 		$order_ids = wc_get_orders( $args );
 		$invoice_count = 0;
@@ -201,8 +260,35 @@ class WPO_WCPDF_Number_Tools {
 				}
 			}
 		}
-		return "{$invoice_count} invoices deleted.";
+		$message = $invoice_count . ' invoices deleted.';
+	} else {
+		$message = 'Invalid date(s) given!';
 	}
+
+	echo $message;
+	wp_die(); // this is required to terminate immediately and return a proper response
+}
+
+function wpo_wcpdf_valid_dates( $dates ) {
+	$valid_dates = true;
+
+	foreach( $dates as $date ) {
+		if ( is_array( $date ) && count( $date ) == 3 ) {
+			//check if each part of the date is numerical
+			foreach ( $date as $date_part ) {
+				if ( !ctype_digit( $date_part ) ) {
+					$valid_dates = false;
+				}
+			}
+			//check if date parts create an existing date
+			if ( $valid_dates !== false && !checkdate( $date[1], $date[2], $date[0] ) ) {
+					$valid_dates = false;
+			}
+		} else {
+			$valid_dates = false;
+		}
+	}
+	return $valid_dates;
 }
 
 endif; // class_exists

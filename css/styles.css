@@ -19,7 +19,8 @@
 .wpo-wcpdf-number-tools .renumber-invoices,
 .wpo-wcpdf-number-tools .delete-invoices { 
 	border-bottom:1px solid #ccc;
-	padding:2em 2em 3em 0;
+	padding:2em 2em 2em 0;
+	margin-bottom:1em;
 	width:70%;
 }
 
@@ -50,10 +51,9 @@
 	border:1px solid #222;
 }
 
-.wpo-wcpdf-number-tools a.button {
+.wpo-wcpdf-number-tools span.renumber-invoices-btn, 
+.wpo-wcpdf-number-tools span.delete-invoices-btn {
 	margin:2em 0 0 0;
-	display:inline-block;
-	width:auto;
 }
 
 .wpo-wcpdf-number-tools .date-range {
@@ -63,5 +63,12 @@
 .wpo-wcpdf-number-tools .date-range span {
 	width:45px;
 	display:inline-block;
+}
+
+.wpo-wcpdf-number-tools .date-range span.add-info {
+	width:auto;	
+	color:#666;
+	font-style:italic;
+	margin-left:1em;
 }
 
