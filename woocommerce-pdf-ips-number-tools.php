@@ -80,7 +80,7 @@ class WPO_WCPDF_Number_Tools {
 	public function number_store_overview( $store_name ) {
 		global $wpdb;
 		echo '<style type="text/css">';
-		include( plugin_dir_path( __FILE__ ) . 'styles.css' );
+		include( plugin_dir_path( __FILE__ ) . 'css/styles.css' );
 		echo '</style>';
 		?>
 		<p>Below is a list of all the invoice numbers generated since the last reset (which happens when you set the "next invoice number" value in the settings). Numbers may have been assigned to orders before this.</p>
