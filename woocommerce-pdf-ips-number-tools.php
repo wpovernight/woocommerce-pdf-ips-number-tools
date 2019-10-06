@@ -204,25 +204,39 @@ function wpo_wcpdf_renumber_invoices() {
 	$valid_dates = wpo_wcpdf_valid_dates( $renumber_dates );
 
 	if ( $valid_dates !== false ) {
-		$args = array(
-			'return'		=> 'ids',
-			'type'			=> 'shop_order',
-			'limit'			=> -1,
-			'order'			=> 'ASC',
-			'date_created'	=> $_POST['renumber_from'] . '...' . $_POST['renumber_to'],
-		);
-		$order_ids = wc_get_orders( $args );
+		$page_count = 0;
 		$invoice_count = 0;
-		foreach ($order_ids as $order_id) {
-			$order = wc_get_order( $order_id );
-			if ( $invoice = wcpdf_get_invoice( $order ) ) {
-				if ( $invoice->exists() ) {
-					$invoice->init_number();
-					$invoice->save();
-					$invoice_count++;
+		$order_ids = '';
+
+		do { 
+			$page_count++;
+
+			$args = array(
+				'return'			=> 'ids',
+				'type'				=> 'shop_order',
+				'limit'				=> -1,
+				'order'				=> 'ASC',
+				'paginate'			=> true,
+				'posts_per_page' 	=> 50,
+				'page'				=> $page_count,
+				'date_created'		=> $_POST['renumber_from'] . '...' . $_POST['renumber_to'],
+			);
+
+			$results = wc_get_orders( $args );
+			$order_ids = $results->orders;
+			
+			foreach ($order_ids as $order_id) {
+				$order = wc_get_order( $order_id );
+				if ( $invoice = wcpdf_get_invoice( $order ) ) {
+					if ( $invoice->exists() ) {
+						$invoice->init_number();
+						$invoice->save();
+						$invoice_count++;
+					}
 				}
 			}
-		}
+
+		} while ( !empty( $order_ids ) );
 		$message = $invoice_count . ' invoices renumbered.';
 	} else {
 		$message = 'Invalid date(s) given!';
@@ -242,24 +256,38 @@ function wpo_wcpdf_delete_invoices() {
 	$valid_dates = wpo_wcpdf_valid_dates( $delete_dates );
 
 	if ( $valid_dates !== false ) {
-		$args = array(
-			'return'		=> 'ids',
-			'type'			=> 'shop_order',
-			'limit'			=> -1,
-			'order'			=> 'ASC',
-			'date_created'	=> $_POST['delete_from'] . '...' . $_POST['delete_to'],
-		);
-		$order_ids = wc_get_orders( $args );
+		$page_count = 0;
 		$invoice_count = 0;
-		foreach ($order_ids as $order_id) {
-			$order = wc_get_order( $order_id );
-			if ( $invoice = wcpdf_get_invoice( $order ) ) {
-				if ( $invoice->exists() ) {
-					$invoice->delete();
-					$invoice_count++;
+		$order_ids = '';
+
+		do { 
+			$page_count++;
+
+			$args = array(
+				'return'			=> 'ids',
+				'type'				=> 'shop_order',
+				'limit'				=> -1,
+				'order'				=> 'ASC',
+				'paginate'			=> true,
+				'posts_per_page'	=> 50,
+				'page'				=> $page_count,
+				'date_created'		=> $_POST['delete_from'] . '...' . $_POST['delete_to'],
+			);
+
+			$results = wc_get_orders( $args );
+			$order_ids = $results->orders;
+
+			foreach ($order_ids as $order_id) {
+				$order = wc_get_order( $order_id );
+				if ( $invoice = wcpdf_get_invoice( $order ) ) {
+					if ( $invoice->exists() ) {
+						$invoice->delete();
+						$invoice_count++;
+					}
 				}
 			}
-		}
+
+		} while ( !empty( $order_ids ) );
 		$message = $invoice_count . ' invoices deleted.';
 	} else {
 		$message = 'Invalid date(s) given!';
