@@ -151,7 +151,7 @@ class WPO_WCPDF_Number_Tools {
 
 				<div class="renumber-invoices">
 					<strong class="name">Renumber existing PDF invoices</strong>
-					<p class="description">This tool will renumber existing PDF invoices, while keeping the assigned invoice date. Set the "next invoice number" setting (WooCommerce > PDF Invoices > Documents > Invoice) to the number you want to use for the first invoice. Note that this process may need to run longer than your server supports, so it is advisable to do this in smaller batches (adjust the date range in the source of the snippet for this tool).</p>
+					<p class="description">This tool will renumber existing PDF invoices, while keeping the assigned invoice date. Set the "next invoice number" setting (WooCommerce > PDF Invoices > Documents > Invoice) to the number you want to use for the first invoice. Note that this process may need to run longer than your server supports, so it is advisable to do this in smaller batches.</p>
 					
 						<div class="date-range">
 							<span>From:</span>
@@ -170,7 +170,7 @@ class WPO_WCPDF_Number_Tools {
 
 				<div class="delete-invoices">
 					<strong class="name">Delete existing PDF invoices</strong>
-					<p class="description">This tool will delete existing PDF invoices. Note that this process may need to run longer than your server supports, so it is advisable to do this in smaller batches (adjust the date range in the source of the snippet for this tool).</p>
+					<p class="description">This tool will delete existing PDF invoices. Note that this process may need to run longer than your server supports, so it is advisable to do this in smaller batches.</p>
 
 					<div class="date-range">
 						<span>From:</span>
