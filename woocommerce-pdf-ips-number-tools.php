@@ -208,8 +208,8 @@ function wpo_wcpdf_renumber_or_delete_invoices() {
 	//Check nonce
 	check_ajax_referer( 'wpo_wcpdf_number_tools_nonce', 'security' );
 
-	$from_date = strtotime( $_POST['date_from'] );
-	$to_date = strtotime( $_POST['date_to'] );
+	$from_date = date_i18n( 'Y-m-d', strtotime( $_POST['date_from'] ) );
+	$to_date = date_i18n( 'Y-m-d', strtotime( $_POST['date_to'] ) );
 	$page_count = $_POST['page_count'];
 	$invoice_count = $_POST['invoice_count'];
 	$delete_or_renumber = $_POST['delete_or_renumber'];
