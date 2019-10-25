@@ -71,3 +71,10 @@
 	margin-left:1em;
 }
 
+.wpo-wcpdf-number-tools .spinner {
+	vertical-align: top;
+	margin: 2.5em 10px 0;
+	float: none;
+	display: inline-block;
+}
+

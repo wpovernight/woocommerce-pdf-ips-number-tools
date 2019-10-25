@@ -128,10 +128,12 @@ class WPO_WCPDF_Number_Tools {
 					dateFrom = $('#renumber-date-from').val();
 					dateTo = $('#renumber-date-to').val();
 					deleteOrRenumber = 'renumber';
+					$('.renumber-spinner').css('visibility', 'visible');
 				} else if (this.id == 'delete-invoices-btn') {
 					dateFrom = $('#delete-date-from').val();
 					dateTo = $('#delete-date-to').val();
 					deleteOrRenumber = 'delete';
+					$('.delete-spinner').css('visibility', 'visible');
 				}
 
 				//First call
@@ -156,6 +158,7 @@ class WPO_WCPDF_Number_Tools {
 							//recall function
 							renumberOrDeleteInvoices(dateFrom, dateTo, pageCount, invoiceCount, deleteOrRenumber);
 						} else {
+							$('.renumber-spinner, .delete-spinner').css('visibility', 'hidden');
 							let message = response.data.message;
 							alert(invoiceCount + message);
 						}
@@ -180,6 +183,7 @@ class WPO_WCPDF_Number_Tools {
 							<input type="text" id="renumber-date-to" name="renumber-date-to" value="<?php echo date('Y-m-d'); ?>" size="10"><span class="add-info">(as: yyyy-mm-dd)</span>
 						</div>
 						<span class="button button-large number-tools-btn" id="renumber-invoices-btn">Renumber invoices</span>
+						<div class="spinner renumber-spinner"></div>
 					<p class="warning"><strong>IMPORTANT:</strong> Create a backup before using this tool, the actions it performs are irreversable!</p>
 				</div>
 
@@ -195,6 +199,7 @@ class WPO_WCPDF_Number_Tools {
 						<input type="text" id="delete-date-to" name="delete-date-to" value="<?php echo date('Y-m-d'); ?>" size="10"><span class="add-info">(as: yyyy-mm-dd)</span>
 					</div>
 					<span class="button button-large number-tools-btn" id="delete-invoices-btn">Delete invoices</span>
+					<div class="spinner delete-spinner"></div>
 					<p class="warning"><strong>IMPORTANT:</strong> Create a backup before using this tool, the actions it performs are irreversable!</p>
 				</div>
 
