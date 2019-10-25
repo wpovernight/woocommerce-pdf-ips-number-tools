@@ -37,8 +37,7 @@ class WPO_WCPDF_Number_Tools {
 	public function __construct() {
 		add_filter( 'wpo_wcpdf_settings_tabs', array( $this, 'number_tools_tab' ), 10, 1);
 		add_action( 'wpo_wcpdf_settings_output_number_tools', array( $this, 'number_tools_page' ), 10, 1);
-		add_action( 'wp_ajax_renumber_invoices', 'wpo_wcpdf_renumber_invoices' );
-		add_action( 'wp_ajax_delete_invoices', 'wpo_wcpdf_delete_invoices' );
+		add_action( 'wp_ajax_renumber_or_delete_invoices', 'wpo_wcpdf_renumber_or_delete_invoices' );
 	}
 
 	public function number_tools_tab( $tabs ) {
@@ -109,6 +108,7 @@ class WPO_WCPDF_Number_Tools {
 	}
 
 	public function number_tools() {
+		$number_tools_nonce = wp_create_nonce( "wpo_wcpdf_number_tools_nonce" );
 		echo '<style type="text/css">';
 		include( plugin_dir_path( __FILE__ ) . 'css/styles.css' );
 		echo '</style>';
@@ -117,210 +117,153 @@ class WPO_WCPDF_Number_Tools {
 		jQuery(document).ready(function($) {
 			$( "#renumber-date-from, #renumber-date-to, #delete-date-from, #delete-date-to" ).datepicker({ dateFormat: 'yy-mm-dd' });
 
-			$('.renumber-invoices-btn').click(function() {
-				let renumberFrom = $('#renumber-date-from').val();
-				let renumberTo = $('#renumber-date-to').val();
-				let data = {
-					'action': 'renumber_invoices',
-					'renumber_from': renumberFrom,
-					'renumber_to': renumberTo
-				};
-				jQuery.post(ajaxurl, data, function(response) {
-					alert(response);
-				});
-			});
+			$('.number-tools-btn').click(function() {
+				let dateFrom = '';
+				let dateTo = '';
+				let deleteOrRenumber = '';
+				let pageCount = 1;
+				let invoiceCount = 0;
 
-			$('.delete-invoices-btn').click(function() {
-				let deleteFrom = $('#delete-date-from').val();
-				let deleteTo = $('#delete-date-to').val();
-				let data = {
-					'action': 'delete_invoices',
-					'delete_from': deleteFrom,
-					'delete_to': deleteTo
+				if (this.id == 'renumber-invoices-btn') {
+					dateFrom = $('#renumber-date-from').val();
+					dateTo = $('#renumber-date-to').val();
+					deleteOrRenumber = 'renumber';
+				} else if (this.id == 'delete-invoices-btn') {
+					dateFrom = $('#delete-date-from').val();
+					dateTo = $('#delete-date-to').val();
+					deleteOrRenumber = 'delete';
+				}
+
+				//First call
+				renumberOrDeleteInvoices(dateFrom, dateTo, pageCount, invoiceCount, deleteOrRenumber);
+
+				function renumberOrDeleteInvoices(dateFrom, dateTo, pageCount, invoiceCount, deleteOrRenumber) {
+					let data = {
+						'action': 'renumber_or_delete_invoices',
+						'delete_or_renumber': deleteOrRenumber,
+						'date_from': dateFrom,
+						'date_to': dateTo,
+						'page_count': pageCount,
+						'invoice_count': invoiceCount,
+						'security': '<?php echo $number_tools_nonce; ?>'
+					};
+
+					jQuery.post(ajaxurl, data, function(response) {
+						if (response.data.finished === false ) {
+							//update page count and invoice count
+							pageCount = response.data.pageCount;
+							invoiceCount = response.data.invoiceCount;
+							//recall function
+							renumberOrDeleteInvoices(dateFrom, dateTo, pageCount, invoiceCount, deleteOrRenumber);
+						} else {
+							let message = response.data.message;
+							alert(invoiceCount + message);
+						}
+					});
 				};
-				jQuery.post(ajaxurl, data, function(response) {
-					alert(response);
-				});
 			});
 		});
 		</script> 
 
 		<div class="wpo-wcpdf-number-tools">
-
 			<form id="number-tools" >
 
 				<div class="renumber-invoices">
 					<strong class="name">Renumber existing PDF invoices</strong>
-					<p class="description">This tool will renumber existing PDF invoices, while keeping the assigned invoice date. Set the "next invoice number" setting (WooCommerce > PDF Invoices > Documents > Invoice) to the number you want to use for the first invoice. Note that this process may need to run longer than your server supports, so it is advisable to do this in smaller batches.</p>
-					
+					<p class="description">This tool will renumber existing PDF invoices within the selected order date range, while keeping the assigned invoice date.<br>Set the "next invoice number" setting (WooCommerce > PDF Invoices > Documents > Invoice) to the number you want to use for the first invoice.</p>
 						<div class="date-range">
 							<span>From:</span>
 							<input type="text" id="renumber-date-from" name="renumber-date-from" value="<?php echo date('Y-m-d'); ?>" size="10"><span class="add-info">(as: yyyy-mm-dd)</span>
 						</div>
-
 						<div class="date-range">
 							<span>To:</span>
 							<input type="text" id="renumber-date-to" name="renumber-date-to" value="<?php echo date('Y-m-d'); ?>" size="10"><span class="add-info">(as: yyyy-mm-dd)</span>
 						</div>
-
-						<span class="button button-large renumber-invoices-btn">Renumber invoices</span>
-
+						<span class="button button-large number-tools-btn" id="renumber-invoices-btn">Renumber invoices</span>
 					<p class="warning"><strong>IMPORTANT:</strong> Create a backup before using this tool, the actions it performs are irreversable!</p>
 				</div>
 
 				<div class="delete-invoices">
 					<strong class="name">Delete existing PDF invoices</strong>
-					<p class="description">This tool will delete existing PDF invoices. Note that this process may need to run longer than your server supports, so it is advisable to do this in smaller batches.</p>
-
+					<p class="description">This tool will delete existing PDF invoices within the selected order date range.</p>
 					<div class="date-range">
 						<span>From:</span>
 						<input type="text" id="delete-date-from" name="delete-date-from" value="<?php echo date('Y-m-d'); ?>" size="10"><span class="add-info">(as: yyyy-mm-dd)</span>
 					</div>
-
 					<div class="date-range">
 						<span>To:</span>
 						<input type="text" id="delete-date-to" name="delete-date-to" value="<?php echo date('Y-m-d'); ?>" size="10"><span class="add-info">(as: yyyy-mm-dd)</span>
 					</div>
-
-					<span class="button button-large delete-invoices-btn">Delete invoices</span>
-
+					<span class="button button-large number-tools-btn" id="delete-invoices-btn">Delete invoices</span>
 					<p class="warning"><strong>IMPORTANT:</strong> Create a backup before using this tool, the actions it performs are irreversable!</p>
 				</div>
 
 			</form>
-
 		</div>
 		<?php
 	}
 }
 
-function wpo_wcpdf_renumber_invoices() {
-	$renumber_dates = array();
-	$message = '';
+function wpo_wcpdf_renumber_or_delete_invoices() {
+	//Check nonce
+	check_ajax_referer( 'wpo_wcpdf_number_tools_nonce', 'security' );
+
+	$from_date = strtotime( $_POST['date_from'] );
+	$to_date = strtotime( $_POST['date_to'] );
+	$page_count = $_POST['page_count'];
+	$invoice_count = $_POST['invoice_count'];
+	$delete_or_renumber = $_POST['delete_or_renumber'];
+	$message = $delete_or_renumber == 'delete' ? ' invoices deleted.' : ' invoices renumbered.';
+	$finished = false;
+
+	$args = array(
+		'return'			=> 'ids',
+		'type'				=> 'shop_order',
+		'limit'				=> -1,
+		'order'				=> 'ASC',
+		'paginate'			=> true,
+		'posts_per_page' 	=> 50,
+		'page'				=> $page_count,
+		'date_created'		=> $from_date . '...' . $to_date,
+	);
+
+	$results = wc_get_orders( $args );
+	$order_ids = $results->orders;
 	
-	$renumber_dates['renumber_from_date'] = explode('-', $_POST['renumber_from'] );
-	$renumber_dates['renumber_to_date'] = explode('-', $_POST['renumber_to'] );
-
-	$valid_dates = wpo_wcpdf_valid_dates( $renumber_dates );
-
-	if ( $valid_dates !== false ) {
-		$page_count = 0;
-		$invoice_count = 0;
-		$order_ids = '';
-
-		do { 
-			$page_count++;
-
-			$args = array(
-				'return'			=> 'ids',
-				'type'				=> 'shop_order',
-				'limit'				=> -1,
-				'order'				=> 'ASC',
-				'paginate'			=> true,
-				'posts_per_page' 	=> 50,
-				'page'				=> $page_count,
-				'date_created'		=> $_POST['renumber_from'] . '...' . $_POST['renumber_to'],
-			);
-
-			$results = wc_get_orders( $args );
-			$order_ids = $results->orders;
-			
-			foreach ($order_ids as $order_id) {
-				$order = wc_get_order( $order_id );
-				if ( $invoice = wcpdf_get_invoice( $order ) ) {
-					if ( $invoice->exists() ) {
+	if ( !empty( $order_ids ) ) {
+		foreach ($order_ids as $order_id) {
+			$order = wc_get_order( $order_id );
+			if ( $invoice = wcpdf_get_invoice( $order ) ) {
+				if ( $invoice->exists() ) {
+					if ( $delete_or_renumber == 'renumber' ) {
 						$invoice->init_number();
 						$invoice->save();
-						$invoice_count++;
-					}
-				}
-			}
-
-		} while ( !empty( $order_ids ) );
-		$message = $invoice_count . ' invoices renumbered.';
-	} else {
-		$message = 'Invalid date(s) given!';
-	}
-
-	echo $message;
-	wp_die(); // this is required to terminate immediately and return a proper response
-}
-
-function wpo_wcpdf_delete_invoices() {
-	$delete_dates = array();
-	$message = '';
-	
-	$delete_dates['delete_from_date'] = explode('-', $_POST['delete_from'] );
-	$delete_dates['delete_to_date'] = explode('-', $_POST['delete_to'] );
-
-	$valid_dates = wpo_wcpdf_valid_dates( $delete_dates );
-
-	if ( $valid_dates !== false ) {
-		$page_count = 0;
-		$invoice_count = 0;
-		$order_ids = '';
-
-		do { 
-			$page_count++;
-
-			$args = array(
-				'return'			=> 'ids',
-				'type'				=> 'shop_order',
-				'limit'				=> -1,
-				'order'				=> 'ASC',
-				'paginate'			=> true,
-				'posts_per_page'	=> 50,
-				'page'				=> $page_count,
-				'date_created'		=> $_POST['delete_from'] . '...' . $_POST['delete_to'],
-			);
-
-			$results = wc_get_orders( $args );
-			$order_ids = $results->orders;
-
-			foreach ($order_ids as $order_id) {
-				$order = wc_get_order( $order_id );
-				if ( $invoice = wcpdf_get_invoice( $order ) ) {
-					if ( $invoice->exists() ) {
+					} elseif ( $delete_or_renumber == 'delete' ) {
 						$invoice->delete();
-						$invoice_count++;
 					}
+					$invoice_count++;
 				}
 			}
-
-		} while ( !empty( $order_ids ) );
-		$message = $invoice_count . ' invoices deleted.';
-	} else {
-		$message = 'Invalid date(s) given!';
-	}
-
-	echo $message;
-	wp_die(); // this is required to terminate immediately and return a proper response
-}
-
-function wpo_wcpdf_valid_dates( $dates ) {
-	$valid_dates = true;
-
-	foreach( $dates as $date ) {
-		if ( is_array( $date ) && count( $date ) == 3 ) {
-			//check if each part of the date is numerical
-			foreach ( $date as $date_part ) {
-				if ( !ctype_digit( $date_part ) ) {
-					$valid_dates = false;
-				}
-			}
-			//check if date parts create an existing date
-			if ( $valid_dates !== false && !checkdate( $date[1], $date[2], $date[0] ) ) {
-					$valid_dates = false;
-			}
-		} else {
-			$valid_dates = false;
 		}
+		$page_count++;
+
+	//No more order IDs
+	} else {
+		$finished = true;
 	}
-	return $valid_dates;
+
+	$response = array(
+		'finished'		=> $finished,
+		'pageCount' 	=> $page_count,
+		'invoiceCount'	=> $invoice_count,
+		'message'		=> $message
+	);
+	wp_send_json_success( $response );	
+		
+	wp_die(); // this is required to terminate immediately and return a proper response
 }
 
 endif; // class_exists
-
 
 /**
  * Returns the main instance of the plugin to prevent the need to use globals.

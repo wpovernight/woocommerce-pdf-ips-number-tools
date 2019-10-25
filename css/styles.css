@@ -51,8 +51,7 @@
 	border:1px solid #222;
 }
 
-.wpo-wcpdf-number-tools span.renumber-invoices-btn, 
-.wpo-wcpdf-number-tools span.delete-invoices-btn {
+.wpo-wcpdf-number-tools .number-tools-btn {
 	margin:2em 0 0 0;
 }
 
