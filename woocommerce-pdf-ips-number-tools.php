@@ -151,6 +151,7 @@ class WPO_WCPDF_Number_Tools {
 					deleteOrRenumber = 'delete';
 					$('.delete-spinner').css('visibility', 'visible');
 					$('#renumber-invoices-btn, #delete-invoices-btn').attr('disabled', true)
+					$('#renumber-date-from, #renumber-date-to, #delete-date-from, #delete-date-to').prop('disabled', true);
 				}
 
 				//First call
