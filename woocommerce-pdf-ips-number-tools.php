@@ -84,7 +84,7 @@ class WPO_WCPDF_Number_Tools {
 				$this->number_tools();
 				break;
 			case 'invoice_numbers':
-				$this->number_store_overview( 'invoice_number');
+				$this->number_store_overview( 'invoice_number' );
 				break;
 		}
 
@@ -92,33 +92,28 @@ class WPO_WCPDF_Number_Tools {
 
 	public function number_store_overview( $store_name ) {
 		global $wpdb;
+		include_once( plugin_dir_path( __FILE__ ) . 'number-store-list-table.php' );
 		echo '<style type="text/css">';
 		include( plugin_dir_path( __FILE__ ) . 'css/styles.css' );
 		echo '</style>';
+
+		$list_table = new WPO_WCPDF_Number_Tools_List_Table();
+		$list_table->prepare_items();
 		?>
 		<p>Below is a list of all the invoice numbers generated since the last reset (which happens when you set the "next invoice number" value in the settings). Numbers may have been assigned to orders before this.</p>
+		<div>
+		<!-- 
+		<?php $list_table->views(); ?>
+		<form id="wpo_wcpdf_number_tools-filter" method="get" action="<?php echo admin_url( 'admin.php' ); ?>">
+			<input type="hidden" name="page" value="wpo_wcpdf_number_tools" />
+			<?php $list_table->search_box( __( 'Search number', 'woocommerce-pdf-ips-number-tools' ), 'wpo_wcpdf_number_tools' ); ?>
+		</form>
+		-->
+		<form id="wpo_wcpdf_number_tools-action" method="post">
+			<?php $list_table->display(); ?>
+		</form>
+		</div>
 		<?php
-		$table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_name}", $store_name, null ); // i.e. wp_wcpdf_invoice_number
-		$results = $wpdb->get_results( "SELECT * FROM {$table_name}" );
-		echo '<table class="wcpdf-invoice-number-store">';
-		echo "<tr><th>Number</th><th>Calculated</th><th>Date</th><th>Order ID</th><th>Status</th></tr>";
-		foreach ($results as $result) {
-			$order = wc_get_order( $result->order_id );
-			if (!empty($order)) {
-				$order_status = $order->get_status();
-				$status = sprintf( '<mark class="order-status %s"><span>%s</span></mark>', esc_attr( sanitize_html_class( 'status-' . $order->get_status() ) ), esc_html( wc_get_order_status_name( $order->get_status() ) ) );
-			} else {
-				$status = "<strong>unknown</strong>";
-
-			}
-
-			$url = sprintf('post.php?post=%s&action=edit', $result->order_id);
-			$link = sprintf('<a href="%s">#%s</a>', $url, $result->order_id);
-			$calculated = isset($result->calculated_number) ? $result->calculated_number : '-';
-			printf("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>", $result->id, $calculated, $result->date, $link, $status);
-		}
-		echo '</table>';
-
 	}
 
 	public function number_tools() {

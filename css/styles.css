@@ -1,13 +1,9 @@
-.wcpdf-invoice-number-store td,
-.wcpdf-invoice-number-store th {
-	background: white;
-	padding: 8px;
-	border: 1px solid #ccc;
+td.column-calculated_number,
+td.column-number {
+	text-align: right;
 }
-.wcpdf-invoice-number-store {
-	margin-top: 5px;
-	border-collapse: collapse;
-	border-spacing: 0;	
+.column-date {
+	width: auto !important;
 }
 
 .wpo-wcpdf-number-tools {
