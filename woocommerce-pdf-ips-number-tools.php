@@ -37,7 +37,8 @@ class WPO_WCPDF_Number_Tools {
 	public function __construct() {
 		add_filter( 'wpo_wcpdf_settings_tabs', array( $this, 'number_tools_tab' ), 10, 1);
 		add_action( 'admin_enqueue_scripts', array( $this, 'load_scripts_styles' ) ); // Load scripts & styles
-		add_action( 'wpo_wcpdf_settings_output_number_tools', array( $this, 'number_tools_page' ), 10, 1);
+		add_action( 'wpo_wcpdf_settings_output_number_tools', '__return_true', 10, 1);
+		add_action( 'wpo_wcpdf_after_settings_page', array( $this, 'number_tools_page' ), 10, 2);
 		add_action( 'wp_ajax_renumber_or_delete_invoices', 'wpo_wcpdf_renumber_or_delete_invoices' );
 	}
 
@@ -59,7 +60,10 @@ class WPO_WCPDF_Number_Tools {
 		return $tabs;
 	}
 
-	public function number_tools_page( $active_section = '' ) {
+	public function number_tools_page( $active_tab = '', $active_section = '' ) {
+		if ( $active_tab !== 'number_tools' ) {
+			return;
+		}
 		if ( empty($active_section) ) {
 			$active_section = 'tools';
 		}
@@ -72,7 +76,8 @@ class WPO_WCPDF_Number_Tools {
 			<ul>
 				<?php
 				foreach ($sections as $section => $title) {
-					printf('<li><a href="%s" class="%s">%s</a></li>', add_query_arg( 'section', $section ), $section == $active_section ? 'active' : '', $title );
+					$url = remove_query_arg( 's', add_query_arg( 'section', $section ) );
+					printf('<li><a href="%s" class="%s">%s</a></li>', $url, $section == $active_section ? 'active' : '', $title );
 				}
 				?>
 			</ul>
@@ -102,16 +107,22 @@ class WPO_WCPDF_Number_Tools {
 		?>
 		<p>Below is a list of all the invoice numbers generated since the last reset (which happens when you set the "next invoice number" value in the settings). Numbers may have been assigned to orders before this.</p>
 		<div>
-		<!-- 
-		<?php $list_table->views(); ?>
-		<form id="wpo_wcpdf_number_tools-filter" method="get" action="<?php echo admin_url( 'admin.php' ); ?>">
-			<input type="hidden" name="page" value="wpo_wcpdf_number_tools" />
-			<?php $list_table->search_box( __( 'Search number', 'woocommerce-pdf-ips-number-tools' ), 'wpo_wcpdf_number_tools' ); ?>
+		<?php // $list_table->views(); ?>
+		<form id="wpo_wcpdf_number_tools-filter" method="get" action="<?= add_query_arg( array() ) ?>">
+			<?php
+			$query_args = array( 'page', 'tab', 'section' );
+			foreach ($query_args as $query_arg) {
+				$value = isset( $_GET[$query_arg]) ? $_GET[$query_arg] : '';
+				printf('<input type="hidden" name="%s" value="%s" />', $query_arg, $value);
+			}
+			$list_table->search_box( __( 'Search number', 'woocommerce-pdf-ips-number-tools' ), 'wpo_wcpdf_number_tools' );
+			?>
 		</form>
-		-->
+
 		<form id="wpo_wcpdf_number_tools-action" method="post">
 			<?php $list_table->display(); ?>
-		</form>
+		</form>		
+
 		</div>
 		<?php
 	}

@@ -1,6 +1,6 @@
 td.column-calculated_number,
 td.column-number {
-	text-align: right;
+	text-align: left;
 }
 .column-date {
 	width: auto !important;
