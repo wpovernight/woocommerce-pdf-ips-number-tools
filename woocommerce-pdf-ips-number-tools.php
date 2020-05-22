@@ -14,9 +14,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( 'WPO_WCPDF_Number_Tools' ) ) :
+if ( !class_exists( 'WPO_WCPDF_Diagnostic_Tools' ) ) :
 
-class WPO_WCPDF_Number_Tools {
+class WPO_WCPDF_Diagnostic_Tools {
 	protected static $_instance = null;
 
 	/**
@@ -35,17 +35,17 @@ class WPO_WCPDF_Number_Tools {
 	 * Constructor
 	 */
 	public function __construct() {
-		add_filter( 'wpo_wcpdf_settings_tabs', array( $this, 'number_tools_tab' ), 10, 1);
+		add_filter( 'wpo_wcpdf_settings_tabs', array( $this, 'diagnostic_tools_tab' ), 10, 1);
 		add_action( 'admin_enqueue_scripts', array( $this, 'load_scripts_styles' ) ); // Load scripts & styles
-		add_action( 'wpo_wcpdf_settings_output_number_tools', '__return_true', 10, 1);
-		add_action( 'wpo_wcpdf_after_settings_page', array( $this, 'number_tools_page' ), 10, 2);
+		add_action( 'wpo_wcpdf_settings_output_diagnostic_tools', '__return_true', 10, 1);
+		add_action( 'wpo_wcpdf_after_settings_page', array( $this, 'diagnostic_tools_page' ), 10, 2);
 		add_action( 'wp_ajax_renumber_or_delete_invoices', 'wpo_wcpdf_renumber_or_delete_invoices' );
 	}
 
 	public function load_scripts_styles( $hook ) {
 		$tab = isset($_GET['tab']) ? $_GET['tab'] : '';
 		$page = isset($_GET['page']) ? $_GET['page'] : '';
-		if( $page != 'wpo_wcpdf_options_page' || $tab != 'number_tools') {
+		if( $page != 'wpo_wcpdf_options_page' || $tab != 'diagnostic_tools') {
 			return;
 		}
 		wp_enqueue_style(
@@ -55,13 +55,13 @@ class WPO_WCPDF_Number_Tools {
 		wp_enqueue_script( 'jquery-ui-datepicker' );
 	}
 
-	public function number_tools_tab( $tabs ) {
-		$tabs['number_tools'] = 'Number Tools';
+	public function diagnostic_tools_tab( $tabs ) {
+		$tabs['diagnostic_tools'] = 'Diagnostic Tools';
 		return $tabs;
 	}
 
-	public function number_tools_page( $active_tab = '', $active_section = '' ) {
-		if ( $active_tab !== 'number_tools' ) {
+	public function diagnostic_tools_page( $active_tab = '', $active_section = '' ) {
+		if ( $active_tab !== 'diagnostic_tools' ) {
 			return;
 		}
 		if ( empty($active_section) ) {
@@ -300,10 +300,10 @@ endif; // class_exists
  * Returns the main instance of the plugin to prevent the need to use globals.
  *
  * @since  1.0
- * @return WPO_WCPDF_Number_Tools
+ * @return WPO_WCPDF_Diagnostic_Tools
  */
-function WPO_WCPDF_Number_Tools() {
-	return WPO_WCPDF_Number_Tools::instance();
+function WPO_WCPDF_Diagnostic_Tools() {
+	return WPO_WCPDF_Diagnostic_Tools::instance();
 }
 
-WPO_WCPDF_Number_Tools(); // load plugin
+WPO_WCPDF_Diagnostic_Tools(); // load plugin
