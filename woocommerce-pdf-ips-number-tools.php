@@ -40,6 +40,7 @@ class WPO_WCPDF_Diagnostic_Tools {
 		add_action( 'wpo_wcpdf_settings_output_diagnostic_tools', '__return_true', 10, 1);
 		add_action( 'wpo_wcpdf_after_settings_page', array( $this, 'diagnostic_tools_page' ), 10, 2);
 		add_action( 'wp_ajax_renumber_or_delete_invoices', 'wpo_wcpdf_renumber_or_delete_invoices' );
+		add_action( 'wp_ajax_remove_options', 'wpo_wcpdf_remove_options' );
 	}
 
 	public function load_scripts_styles( $hook ) {
@@ -87,6 +88,7 @@ class WPO_WCPDF_Diagnostic_Tools {
 			case 'tools':
 			default:
 				$this->number_tools();
+				$this->remove_options();
 				break;
 			case 'invoice_numbers':
 				$this->number_store_overview( 'invoice_number' );
@@ -197,7 +199,7 @@ class WPO_WCPDF_Diagnostic_Tools {
 		<div class="wpo-wcpdf-number-tools">
 			<form id="number-tools" >
 
-				<div class="renumber-invoices">
+				<div class="renumber-invoices wpo-wcpdf-diagnostic-tool">
 					<strong class="name">Renumber existing PDF invoices</strong>
 					<p class="description">This tool will renumber existing PDF invoices within the selected order date range, while keeping the assigned invoice date.<br>Set the "next invoice number" setting (WooCommerce > PDF Invoices > Documents > Invoice) to the number you want to use for the first invoice.</p>
 						<div class="date-range">
@@ -213,7 +215,7 @@ class WPO_WCPDF_Diagnostic_Tools {
 					<p class="warning"><strong>IMPORTANT:</strong> Create a backup before using this tool, the actions it performs are irreversable!</p>
 				</div>
 
-				<div class="delete-invoices">
+				<div class="delete-invoices wpo-wcpdf-diagnostic-tool">
 					<strong class="name">Delete existing PDF invoices</strong>
 					<p class="description">This tool will delete existing PDF invoices within the selected order date range.</p>
 					<div class="date-range">
@@ -230,6 +232,85 @@ class WPO_WCPDF_Diagnostic_Tools {
 				</div>
 
 			</form>
+		</div>
+		<?php
+	}
+
+	public function remove_options() {
+		$remove_options_nonce = wp_create_nonce( "wpo_wcpdf_remove_options_nonce" );
+		//Check active PDF Invoices extensions
+		$active_pro_plugins = array( 
+			'professional' => class_exists( 'WooCommerce_PDF_IPS_Pro' ) ? true : false,
+			'templates' => class_exists( 'WooCommerce_PDF_IPS_Templates' ) || class_exists( 'WPO_WCPDF_Templates' ) ? true : false,
+		);
+
+		?>
+		<script type="text/javascript" >
+		jQuery(document).ready(function($) {
+
+			$('.wpo-wcpdf-remove-options button').click(function() {
+
+				// Set options to be removed 
+				let optionsToRemove = null;
+				// Free
+				if ( $(this).hasClass('remove-free-options') ) {
+					optionsToRemove = ['wpo_wcpdf_settings_general'];
+				// Professional
+				} else if ( $(this).hasClass('remove-professional-options') ) {
+					optionsToRemove = ['wpo_wcpdf_settings_professional'];
+				// Templates
+				} else if ( $(this).hasClass('remove-templates-options') ) {
+					optionsToRemove = ['wpo_wcpdf_template_settings'];
+				}
+
+				if (optionsToRemove !== null) {
+					removeOptions(optionsToRemove);
+				}
+			
+				function removeOptions(optionsToRemove) {
+					let data = {
+						'action': 'remove_options',
+						'options_to_remove': optionsToRemove,
+						'security': '<?php echo $remove_options_nonce; ?>'
+					};
+
+					jQuery.post(ajaxurl, data, function(response) {
+						let removedOptions = response.data.removedOptions;
+						let message = response.data.message;
+						alert(removedOptions + ' ' + message);
+					});
+				}
+			});
+
+		});
+		</script> 
+
+		<div class="wpo-wcpdf-remove-options wpo-wcpdf-diagnostic-tool">
+			<strong class="name">Remove plugin options</strong>
+			<p class="description">This tool will remove the plugin options from the wp_options table.</p>
+
+			<table>
+
+				<tr class="remove-option">
+					<td><span>WooCommerce PDF Invoices & Packing Slips</span></td>
+					<td><button class="button button-large remove-free-options">Remove options</button></td>
+				</tr>
+				
+				<?php if ( $active_pro_plugins['professional'] ) : ?>
+					<tr class="remove-option">
+						<td><span>WooCommerce PDF Invoices & Packing Slips Professional</span></td>
+						<td><button class="button button-large remove-professional-options">Remove options</button></td>
+					</tr>
+				<?php endif; ?>
+
+				<?php if ( $active_pro_plugins['templates'] ) : ?>
+					<tr class="remove-option">
+						<td><span>WooCommerce PDF Invoices & Packing Slips Premium Templates</span></td>
+						<td><button class="button button-large remove-templates-options ">Remove options</button></td>
+					</tr>
+				<?php endif; ?>
+
+			</table>
 		</div>
 		<?php
 	}
@@ -288,6 +369,25 @@ function wpo_wcpdf_renumber_or_delete_invoices() {
 		'pageCount' 	=> $page_count,
 		'invoiceCount'	=> $invoice_count,
 		'message'		=> $message
+	);
+	wp_send_json_success( $response );	
+		
+	wp_die(); // this is required to terminate immediately and return a proper response
+}
+
+function wpo_wcpdf_remove_options() {
+	//Check nonce
+	check_ajax_referer( 'wpo_wcpdf_remove_options_nonce', 'security' );
+
+	$options_to_remove = $_POST['options_to_remove'];
+
+	// Remove options from wp_options here...
+
+	$message = 'removed from wp_options table.';
+
+	$response = array(
+		'message'			=> $message,
+		'removedOptions'	=> $options_to_remove,
 	);
 	wp_send_json_success( $response );	
 		

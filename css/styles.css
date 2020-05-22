@@ -12,8 +12,7 @@ td.column-number {
 	font-weight:normal;
 }
 
-.wpo-wcpdf-number-tools .renumber-invoices,
-.wpo-wcpdf-number-tools .delete-invoices { 
+.wpo-wcpdf-diagnostic-tool { 
 	border-bottom:1px solid #ccc;
 	padding:2em 2em 2em 0;
 	margin-bottom:1em;
@@ -25,14 +24,16 @@ td.column-number {
 	font-weight:bold;
 }
 
-.wpo-wcpdf-number-tools strong.name {
+.wpo-wcpdf-number-tools strong.name,
+.wpo-wcpdf-remove-options strong.name  {
 	font-size:1.2em;
 	color:#222;
 	padding:1em 0 0.4em 0;
 	display:block;
 }
 
-.wpo-wcpdf-number-tools .description {
+.wpo-wcpdf-number-tools .description,
+.wpo-wcpdf-remove-options .description {
 	font-style:normal;
 	color:#333;
 	padding-bottom:2em;
@@ -72,5 +73,13 @@ td.column-number {
 	margin: 2.5em 10px 0;
 	float: none;
 	display: inline-block;
+}
+
+.wpo-wcpdf-remove-options .remove-option td {
+	padding-bottom: 15px;
+}
+
+.wpo-wcpdf-remove-options .remove-option button {
+	margin-left:15px;
 }
 
