@@ -250,36 +250,18 @@ class WPO_WCPDF_Diagnostic_Tools {
 
 			$('.wpo-wcpdf-remove-options button').click(function() {
 
-				// Set options to be removed 
-				let optionsToRemove = null;
-				// Free
-				if ( $(this).hasClass('remove-free-options') ) {
-					optionsToRemove = ['wpo_wcpdf_settings_general'];
-				// Professional
-				} else if ( $(this).hasClass('remove-professional-options') ) {
-					optionsToRemove = ['wpo_wcpdf_settings_professional'];
-				// Templates
-				} else if ( $(this).hasClass('remove-templates-options') ) {
-					optionsToRemove = ['wpo_wcpdf_template_settings'];
-				}
+				let data = {
+					'action': 'remove_options',
+					'remove_options_from': $(this).data('remove'),
+					'security': '<?php echo $remove_options_nonce; ?>'
+				};
 
-				if (optionsToRemove !== null) {
-					removeOptions(optionsToRemove);
-				}
+				jQuery.post(ajaxurl, data, function(response) {
+					let removedOptions = response.data.removedOptions;
+					let message = response.data.message;
+					alert(removedOptions.join(', ') + ' ' + message);
+				});
 			
-				function removeOptions(optionsToRemove) {
-					let data = {
-						'action': 'remove_options',
-						'options_to_remove': optionsToRemove,
-						'security': '<?php echo $remove_options_nonce; ?>'
-					};
-
-					jQuery.post(ajaxurl, data, function(response) {
-						let removedOptions = response.data.removedOptions;
-						let message = response.data.message;
-						alert(removedOptions + ' ' + message);
-					});
-				}
 			});
 
 		});
@@ -293,20 +275,20 @@ class WPO_WCPDF_Diagnostic_Tools {
 
 				<tr class="remove-option">
 					<td><span>WooCommerce PDF Invoices & Packing Slips</span></td>
-					<td><button class="button button-large remove-free-options">Remove options</button></td>
+					<td><button class="button button-large remove-free-options" data-remove="free">Remove options</button></td>
 				</tr>
 				
 				<?php if ( $active_pro_plugins['professional'] ) : ?>
 					<tr class="remove-option">
 						<td><span>WooCommerce PDF Invoices & Packing Slips Professional</span></td>
-						<td><button class="button button-large remove-professional-options">Remove options</button></td>
+						<td><button class="button button-large remove-professional-options" data-remove="professional">Remove options</button></td>
 					</tr>
 				<?php endif; ?>
 
 				<?php if ( $active_pro_plugins['templates'] ) : ?>
 					<tr class="remove-option">
 						<td><span>WooCommerce PDF Invoices & Packing Slips Premium Templates</span></td>
-						<td><button class="button button-large remove-templates-options ">Remove options</button></td>
+						<td><button class="button button-large remove-templates-options" data-remove="templates">Remove options</button></td>
 					</tr>
 				<?php endif; ?>
 
@@ -376,18 +358,46 @@ function wpo_wcpdf_renumber_or_delete_invoices() {
 }
 
 function wpo_wcpdf_remove_options() {
+	
 	//Check nonce
 	check_ajax_referer( 'wpo_wcpdf_remove_options_nonce', 'security' );
 
-	$options_to_remove = $_POST['options_to_remove'];
+	$removable_options = array(
 
-	// Remove options from wp_options here...
+		'free' => array(
+			'wpo_wcpdf_settings_general', 
+			'wpo_wcpdf_settings_debug', 
+			'wpo_wcpdf_documents_settings_invoice',
+			'wpo_wcpdf_documents_settings_packing-slip',
+		),
+		'professional' => array(
+			'wpo_wcpdf_settings_pro',
+			'wpo_wcpdf_documents_settings_proforma',
+			'wpo_wcpdf_documents_settings_credit-note', 
+			'wpo_wcpdf_dropbox_api_v2', 
+			'wpo_wcpdf_dropbox_last_export', 
+			'wpo_wcpdf_dropbox_license',
+			'wpo_wcpdf_dropbox_queue', 
+			'wpo_wcpdf_dropbox_settings', 
+			'wpo_wcpdf_dropbox_version',
+		),
+		'templates' => array(
+			'wpo_wcpdf_editor_settings',
+		),
+
+	);
+
+	$remove_options_from = sanitize_text_field( $_POST['remove_options_from'] );
+
+	foreach ( $removable_options[$remove_options_from] as $option ) {
+		delete_option( $option );
+	}
 
 	$message = 'removed from wp_options table.';
 
 	$response = array(
 		'message'			=> $message,
-		'removedOptions'	=> $options_to_remove,
+		'removedOptions'	=> $removable_options[$remove_options_from],
 	);
 	wp_send_json_success( $response );	
 		
