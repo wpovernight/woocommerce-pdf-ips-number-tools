@@ -137,7 +137,9 @@ class WPO_WCPDF_Number_Tools {
 		jQuery(document).ready(function($) {
 			$( "#renumber-date-from, #renumber-date-to, #delete-date-from, #delete-date-to" ).datepicker({ dateFormat: 'yy-mm-dd' });
 
-			$('.number-tools-btn').click(function() {
+			$('.number-tools-btn').click(function( event ) {
+				event.preventDefault();
+
 				let dateFrom = '';
 				let dateTo = '';
 				let deleteOrRenumber = '';
