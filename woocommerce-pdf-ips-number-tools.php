@@ -133,7 +133,7 @@ class WPO_WCPDF_Number_Tools {
 		include( plugin_dir_path( __FILE__ ) . 'css/styles.css' );
 		echo '</style>';
 		?>
-		<script type="text/javascript" >
+		<script>
 		jQuery(document).ready(function($) {
 			$( "#renumber-date-from, #renumber-date-to, #delete-date-from, #delete-date-to" ).datepicker({ dateFormat: 'yy-mm-dd' });
 
@@ -176,19 +176,28 @@ class WPO_WCPDF_Number_Tools {
 						'security': '<?php echo $number_tools_nonce; ?>'
 					};
 
-					jQuery.post(ajaxurl, data, function(response) {
-						if (response.data.finished === false ) {
-							//update page count and invoice count
-							pageCount = response.data.pageCount;
-							invoiceCount = response.data.invoiceCount;
-							//recall function
-							renumberOrDeleteInvoices(dateFrom, dateTo, pageCount, invoiceCount, deleteOrRenumber);
-						} else {
-							$('.renumber-spinner, .delete-spinner').css('visibility', 'hidden');
-							$('#renumber-invoices-btn, #delete-invoices-btn').removeAttr('disabled');
-							$('#renumber-date-from, #renumber-date-to, #delete-date-from, #delete-date-to').removeProp('disabled');
-							let message = response.data.message;
-							alert(invoiceCount + message);
+					$.ajax({
+						type:		'POST',
+						url:		ajaxurl,
+						data:		data,
+						dataType:	'json',
+						success: function(response){
+							if (response.data.finished === false ) {
+								//update page count and invoice count
+								pageCount = response.data.pageCount;
+								invoiceCount = response.data.invoiceCount;
+								//recall function
+								renumberOrDeleteInvoices(dateFrom, dateTo, pageCount, invoiceCount, deleteOrRenumber);
+							} else {
+								$('.renumber-spinner, .delete-spinner').css('visibility', 'hidden');
+								$('#renumber-invoices-btn, #delete-invoices-btn').removeAttr('disabled');
+								$('#renumber-date-from, #renumber-date-to, #delete-date-from, #delete-date-to').removeProp('disabled');
+								let message = response.data.message;
+								alert(invoiceCount + message);
+							}
+						},
+						error: function(xhr, ajaxOptions, thrownError) {
+							alert(xhr.status+ ':'+ thrownError);
 						}
 					});
 				};
