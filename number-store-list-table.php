@@ -222,7 +222,7 @@ class WPO_WCPDF_Number_Tools_List_Table extends \WP_List_Table {
 		$paged        = $this->get_paged();
 		$offset       = $this->per_page * ( $paged - 1 );
 		$search       = $this->get_search();
-		$number_store = isset( $_GET['number_store']  ) ? sanitize_text_field( $_GET['number_store']  ) : 'invoice_number';
+		$number_store = isset( $_GET['number_store']  ) ? sanitize_text_field( $_GET['number_store']  ) : null;
 		$order        = isset( $_GET['order']   ) ? sanitize_text_field( $_GET['order']   ) : 'DESC';
 		$orderby      = isset( $_GET['orderby'] ) ? sanitize_text_field( $_GET['orderby'] ) : 'id';
 
@@ -234,11 +234,15 @@ class WPO_WCPDF_Number_Tools_List_Table extends \WP_List_Table {
 		// 	'status'  => $status
 		// );
 
-		$table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$number_store}", $number_store, null ); // i.e. wp_wcpdf_invoice_number
-		if ( $search ) {
-			$results = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name WHERE `id` LIKE $search OR `order_id` LIKE $search ORDER BY $orderby $order LIMIT %d OFFSET %d", $this->per_page, $offset));
+		if( ! empty( $number_store ) ) {
+			$table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$number_store}", $number_store, null ); // i.e. wp_wcpdf_invoice_number
+			if ( $search ) {
+				$results = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name WHERE `id` LIKE $search OR `order_id` LIKE $search ORDER BY $orderby $order LIMIT %d OFFSET %d", $this->per_page, $offset));
+			} else {
+				$results = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name ORDER BY $orderby $order LIMIT %d OFFSET %d", $this->per_page, $offset));
+			}
 		} else {
-			$results = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name ORDER BY $orderby $order LIMIT %d OFFSET %d", $this->per_page, $offset));
+			$results = 0;
 		}
 
 		return $results;
@@ -263,16 +267,20 @@ class WPO_WCPDF_Number_Tools_List_Table extends \WP_List_Table {
 
 		$number_store = isset( $_GET['number_store'] )
 			? sanitize_key( $_GET['number_store'] )
-			: 'invoice_number';
-		$table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$number_store}", $number_store, null ); // i.e. wp_wcpdf_invoice_number
+			: null;
 
-		$this->items = $this->get_numbers();
-		if ( $search = $this->get_search() ) {
-			$total_items = $wpdb->get_var("SELECT COUNT(id) FROM {$table_name}  WHERE `id` LIKE $search OR `order_id` LIKE $search");
+		if( ! empty( $number_store ) ) {
+			$table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$number_store}", $number_store, null ); // i.e. wp_wcpdf_invoice_number or wp_wcpdf_invoice_number_2021
+
+			$this->items = $this->get_numbers();
+			if ( $search = $this->get_search() ) {
+				$total_items = $wpdb->get_var("SELECT COUNT(id) FROM {$table_name}  WHERE `id` LIKE $search OR `order_id` LIKE $search");
+			} else {
+				$total_items = $wpdb->get_var("SELECT COUNT(id) FROM {$table_name}");
+			}
 		} else {
-			$total_items = $wpdb->get_var("SELECT COUNT(id) FROM {$table_name}");
+			$total_items = 0;
 		}
-
 
 		// Setup pagination
 		$this->set_pagination_args( array(

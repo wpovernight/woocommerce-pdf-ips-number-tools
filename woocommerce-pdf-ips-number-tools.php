@@ -105,26 +105,76 @@ class WPO_WCPDF_Number_Tools {
 		$list_table = new WPO_WCPDF_Number_Tools_List_Table();
 		$list_table->prepare_items();
 		?>
-		<p>Below is a list of all the invoice numbers generated since the last reset (which happens when you set the "next invoice number" value in the settings). Numbers may have been assigned to orders before this.</p>
-		<div>
+		<table class="form-table">
+			<tbody>
+				<tr>
+					<th scope="row"><?php _e( 'Choose a number store', 'wpo_wcpdf_number_tools' ); ?></th>
+					<td>
+						<form id="wpo_wcpdf_number_tools-store" method="get" action="<?= add_query_arg( array() ) ?>">
+							<select name="number_store">
+								<option selected disabled><?php _e( 'Select', 'wpo_wcpdf_number_tools' ); ?> ...</option>
+								<?php foreach( $this->get_number_store_names() as $store_name ) : ?>
+									<?php if( isset( $_GET['number_store'] ) && $_GET['number_store'] == $store_name ) : ?>
+										<option value="<?= $store_name; ?>" selected><?= $store_name; ?></option>
+									<?php else : ?>
+										<option value="<?= $store_name; ?>"><?= $store_name; ?></option>
+									<?php endif; ?>
+								<?php endforeach; ?>
+							</select>
+							<?php
+								$query_args = array( 'page', 'tab', 'section' );
+								foreach ($query_args as $query_arg) {
+									$value = isset( $_GET[$query_arg]) ? $_GET[$query_arg] : '';
+									printf('<input type="hidden" name="%s" value="%s" />', $query_arg, $value);
+								}
+							?>
+							<button class="button">Apply</button>
+						</form>
+					</td>
+				</tr>
+			</tbody>
+		</table>
 		<?php // $list_table->views(); ?>
-		<form id="wpo_wcpdf_number_tools-filter" method="get" action="<?= add_query_arg( array() ) ?>">
-			<?php
-			$query_args = array( 'page', 'tab', 'section' );
-			foreach ($query_args as $query_arg) {
-				$value = isset( $_GET[$query_arg]) ? $_GET[$query_arg] : '';
-				printf('<input type="hidden" name="%s" value="%s" />', $query_arg, $value);
-			}
-			$list_table->search_box( __( 'Search number', 'woocommerce-pdf-ips-number-tools' ), 'wpo_wcpdf_number_tools' );
-			?>
-		</form>
-
-		<form id="wpo_wcpdf_number_tools-action" method="post">
-			<?php $list_table->display(); ?>
-		</form>		
-
-		</div>
+		<?php if( isset( $_GET['number_store'] ) ) : ?>
+			<p>Below is a list of all the invoice numbers generated since the last reset (which happens when you set the "next invoice number" value in the settings). Numbers may have been assigned to orders before this.</p>
+			<div>
+				<form id="wpo_wcpdf_number_tools-filter" method="get" action="<?= add_query_arg( array() ) ?>">
+					<?php
+					$query_args = array( 'page', 'tab', 'section', 'number_store' );
+					foreach ($query_args as $query_arg) {
+						$value = isset( $_GET[$query_arg]) ? $_GET[$query_arg] : '';
+						printf('<input type="hidden" name="%s" value="%s" />', $query_arg, $value);
+					}
+					$list_table->search_box( __( 'Search number', 'woocommerce-pdf-ips-number-tools' ), 'wpo_wcpdf_number_tools' );
+					?>
+				</form>
+			
+				<form id="wpo_wcpdf_number_tools-action" method="post">
+					<?php $list_table->display(); ?>
+				</form>
+			</div>	
+		<?php else : ?>
+			<div class="notice notice-info inline">
+				<p><?php _e( 'Please select a number store!', 'wpo_wcpdf_number_tools' ); ?></p>
+			</div>
+		<?php endif; ?>
 		<?php
+	}
+
+	private function get_number_store_names() {
+		global $wpdb;
+		$tables = $wpdb->get_results( "SHOW TABLES LIKE '%invoice_number%'" );
+
+		$store_names = array();
+		foreach( $tables as $table ) {
+			foreach( $table as $name ) {
+				$store_names[] = str_replace( "{$wpdb->prefix}wcpdf_", '', $name );
+			}
+		}
+
+		rsort( $store_names );
+
+		return $store_names;
 	}
 
 	public function number_tools() {
