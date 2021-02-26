@@ -3,7 +3,7 @@
  * Plugin Name: WooCommerce PDF Invoices & Packing Slips number tools
  * Plugin URI: http://www.wpovernight.com
  * Description: Provides debugging tools for invoice numbers
- * Version: 2.1
+ * Version: 2.2
  * Author: Ewout Fernhout
  * Author URI: http://www.wpovernight.com
  * License: GPLv2 or later
