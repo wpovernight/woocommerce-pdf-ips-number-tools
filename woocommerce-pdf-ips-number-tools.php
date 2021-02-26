@@ -65,11 +65,11 @@ class WPO_WCPDF_Number_Tools {
 			return;
 		}
 		if ( empty($active_section) ) {
-			$active_section = 'tools';
+			$active_section = 'numbers';
 		}
 		$sections = [
-			'tools'           => __('Tools'),
-			'invoice_numbers' => __('Invoice Numbers'),
+			'numbers' => __('Document Numbers'),
+			'tools'   => __('Tools'),
 		];
 		?>
 		<div class="wcpdf_document_settings_sections">
@@ -84,12 +84,12 @@ class WPO_WCPDF_Number_Tools {
 		</div>
 		<?php
 		switch ( $active_section ) {
-			case 'tools':
+			case 'numbers':
 			default:
-				$this->number_tools();
-				break;
-			case 'invoice_numbers':
 				$this->number_store_overview( 'invoice_number' );
+				break;
+			case 'tools':
+				$this->number_tools();
 				break;
 		}
 
