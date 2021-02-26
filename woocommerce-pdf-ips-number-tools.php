@@ -144,7 +144,7 @@ class WPO_WCPDF_Number_Tools {
 		</table>
 		<?php // $list_table->views(); ?>
 		<?php if( ! empty( $selected_table_name ) && ! empty( $number_store_tables[$selected_table_name] ) ) : ?>
-			<p>Below is a list of all the invoice numbers generated since the last reset (which happens when you set the "next invoice number" value in the settings). Numbers may have been assigned to orders before this.</p>
+			<p>Below is a list of all the document numbers generated since the last reset (which happens when you set the "next {document name} number" value in the settings). Numbers may have been assigned to orders before this.</p>
 			<div>
 				<form id="wpo_wcpdf_number_tools-filter" method="get" action="<?= add_query_arg( array() ) ?>">
 					<?php
