@@ -109,7 +109,7 @@ class WPO_WCPDF_Number_Tools {
 			$year = date('Y');
 			$_GET['table_name'] = $selected_table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_name}_{$year}", $store_name, null ); // i.e. wp_wcpdf_invoice_number or wp_wcpdf_invoice_number_2021
 			if( ! isset( $number_store_tables[ $_GET['table_name'] ] ) ) {
-				$_GET['table_name'] = null;
+				$_GET['table_name'] = $selected_table_name = null;
 			}
 		}
 
