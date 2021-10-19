@@ -40,6 +40,55 @@ class WPO_WCPDF_Number_Tools {
 		add_action( 'wpo_wcpdf_settings_output_number_tools', '__return_true', 10, 1);
 		add_action( 'wpo_wcpdf_after_settings_page', array( $this, 'number_tools_page' ), 10, 2);
 		add_action( 'wp_ajax_renumber_or_delete_invoices', 'wpo_wcpdf_renumber_or_delete_invoices' );
+		add_action( 'admin_notices', array( $this, 'deactivate_extension_notice' ) );
+
+		// on activation
+		register_activation_hook( __FILE__, array( $this, 'activate' ) );
+
+		// on deactivation
+		register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
+	}
+
+	/**
+	 * Activation hook
+	 */
+	public function activate() {
+		set_transient( 'wpo_wcpdf_number_tools_activated', current_time( 'timestamp' ) );
+	}
+
+	/**
+	 * Deactivation hook
+	 */
+	public function deactivate() {
+		delete_transient( 'wpo_wcpdf_number_tools_activated' );
+	}
+
+	public function deactivate_extension_notice() {
+		if( $activation_timestamp = get_transient( 'wpo_wcpdf_number_tools_activated' ) ) {
+			$message         = __( "You have the PDF Number Tools extension activated for more than a week now. If you don't plan to use it, we recommend you to deactivate it!", 'wpo_wcpdf_number_tools' );
+			$activation_date = new DateTime();
+			$activation_date->setTimestamp( $activation_timestamp );
+			$current_date    = new DateTime( 'now' );
+			$difference      = $activation_date->diff( $current_date );
+
+			if( $difference->days > 30 ) {
+				ob_start();
+				?>
+				<div class="notice notice-info">
+					<p><?= $message; ?></p>
+					<p><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_number_tools_activated_notice', 'true' ) ); ?>"><?php _e( 'Hide this message', 'wpo_wcpdf_number_tools' ); ?></a></p>
+				</div>
+				<?php
+				echo ob_get_clean();
+			}
+		}
+
+		// delete transient on dismiss
+		if ( isset( $_GET['wpo_wcpdf_number_tools_activated_notice'] ) ) {
+			delete_transient( 'wpo_wcpdf_number_tools_activated' );
+			wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
+			exit;
+		}
 	}
 
 	public function load_scripts_styles( $hook ) {
