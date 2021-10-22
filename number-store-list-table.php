@@ -108,7 +108,7 @@ class WPO_WCPDF_Number_Tools_List_Table extends \WP_List_Table {
 					$order_status = $order->get_status();
 					$value = sprintf( '<mark class="order-status %s"><span>%s</span></mark>', esc_attr( sanitize_html_class( 'status-' . $order->get_status() ) ), esc_html( wc_get_order_status_name( $order->get_status() ) ) );
 				} else {
-					$value = "<strong>unknown</strong>";
+					$value = '<strong>' . __('Unknown', 'woocommerce-pdf-ips-number-tools') .'</strong>';
 				}
 				break;
 			default:
@@ -156,7 +156,7 @@ class WPO_WCPDF_Number_Tools_List_Table extends \WP_List_Table {
 			'calculated_number' => __( 'Calculated',       'woocommerce-pdf-ips-number-tools' ),
 			'date'              => __( 'Date',             'woocommerce-pdf-ips-number-tools' ),
 			'order'             => __( 'Order',            'woocommerce-pdf-ips-number-tools' ),
-			'order_status'      => __( 'Order Status',           'woocommerce-pdf-ips-number-tools' ),
+			'order_status'      => __( 'Order Status',     'woocommerce-pdf-ips-number-tools' ),
 		);
 		if ( ! isset( WPO_WCPDF()->settings->debug_settings['calculate_document_numbers'] ) ) {
 			unset( $columns['calculated_number'] );

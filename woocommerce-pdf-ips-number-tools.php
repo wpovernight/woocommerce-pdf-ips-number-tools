@@ -1,13 +1,14 @@
 <?php
 /**
- * Plugin Name: WooCommerce PDF Invoices & Packing Slips number tools
+ * Plugin Name: WooCommerce PDF Invoices & Packing Slips Number Tools
  * Plugin URI: http://www.wpovernight.com
  * Description: Provides debugging tools for invoice numbers
  * Version: 2.2.1
  * Author: Ewout Fernhout
- * Author URI: http://www.wpovernight.com
+ * Author URI: https://www.wpovernight.com/
  * License: GPLv2 or later
  * License URI: http://www.opensource.org/licenses/gpl-license.php
+	* Text Domain: woocommerce-pdf-ips-number-tools
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -35,6 +36,7 @@ class WPO_WCPDF_Number_Tools {
 	 * Constructor
 	 */
 	public function __construct() {
+		add_action( 'init', array($this, 'load_textdomain') );
 		add_filter( 'wpo_wcpdf_settings_tabs', array( $this, 'number_tools_tab' ), 10, 1);
 		add_action( 'admin_enqueue_scripts', array( $this, 'load_scripts_styles' ) ); // Load scripts & styles
 		add_action( 'wpo_wcpdf_settings_output_number_tools', '__return_true', 10, 1);
@@ -65,7 +67,7 @@ class WPO_WCPDF_Number_Tools {
 
 	public function deactivate_extension_notice() {
 		if( $activation_timestamp = get_transient( 'wpo_wcpdf_number_tools_activated' ) ) {
-			$message         = __( "You have the PDF Number Tools extension activated for more than a week now. If you don't plan to use it, we recommend you to deactivate it!", 'wpo_wcpdf_number_tools' );
+			$message         = __( "You have activated the <strong>Number Tools</strong> extension for <strong>WooCommerce PDF Invoices & Packing Slips</strong> for more than a week now. If you don't plan to use it, we recommend you to deactivate it!", 'woocommerce-pdf-ips-number-tools' );
 			$activation_date = new DateTime();
 			$activation_date->setTimestamp( $activation_timestamp );
 			$current_date    = new DateTime( 'now' );
@@ -76,7 +78,7 @@ class WPO_WCPDF_Number_Tools {
 				?>
 				<div class="notice notice-info">
 					<p><?= $message; ?></p>
-					<p><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_number_tools_activated_notice', 'true' ) ); ?>"><?php _e( 'Hide this message', 'wpo_wcpdf_number_tools' ); ?></a></p>
+					<p><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_number_tools_activated_notice', 'true' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-ips-number-tools' ); ?></a></p>
 				</div>
 				<?php
 				echo ob_get_clean();
@@ -90,6 +92,15 @@ class WPO_WCPDF_Number_Tools {
 			exit;
 		}
 	}
+
+	/**
+		* Load plugin textdomain.
+		*
+		* @return void
+		*/
+		public function load_textdomain() {
+			load_plugin_textdomain( 'woocommerce-pdf-ips-number-tools', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+		}
 
 	public function load_scripts_styles( $hook ) {
 		$tab = isset($_GET['tab']) ? $_GET['tab'] : '';
@@ -117,7 +128,7 @@ class WPO_WCPDF_Number_Tools {
 			$active_section = 'numbers';
 		}
 		$sections = [
-			'numbers' => __('Document Numbers'),
+			'numbers' => __('Document Numbers', 'woocommerce-pdf-ips-number-tools'),
 			'tools'   => __('Tools'),
 		];
 		?>
@@ -168,11 +179,11 @@ class WPO_WCPDF_Number_Tools {
 		<table class="form-table">
 			<tbody>
 				<tr>
-					<th scope="row"><?php _e( 'Choose a number store', 'wpo_wcpdf_number_tools' ); ?></th>
+					<th scope="row"><?php _e( 'Choose a number store', 'woocommerce-pdf-ips-number-tools' ); ?></th>
 					<td>
 						<form id="wpo_wcpdf_number_tools-store" method="get" action="<?= add_query_arg( array() ) ?>">
 							<select name="table_name">
-								<option selected disabled><?php _e( 'Select', 'wpo_wcpdf_number_tools' ); ?> ...</option>
+								<option selected disabled><?php _e( 'Select…', 'woocommerce-pdf-ips-number-tools' ); ?></option>
 								<?php foreach( $number_store_tables as $table_name => $title ) : ?>
 									<?php if( isset( $_GET['table_name'] ) && $_GET['table_name'] == $table_name ) : ?>
 										<option value="<?= $table_name; ?>" selected><?= $title; ?></option>
@@ -188,7 +199,7 @@ class WPO_WCPDF_Number_Tools {
 									printf('<input type="hidden" name="%s" value="%s" />', $query_arg, $value);
 								}
 							?>
-							<button class="button">View</button>
+							<button class="button"><?php _e('View', 'woocommerce-pdf-ips-number-tools'); ?></button>
 						</form>
 					</td>
 				</tr>
@@ -196,7 +207,7 @@ class WPO_WCPDF_Number_Tools {
 		</table>
 		<?php // $list_table->views(); ?>
 		<?php if( ! empty( $selected_table_name ) && ! empty( $number_store_tables[$selected_table_name] ) ) : ?>
-			<p>Below is a list of all the document numbers generated since the last reset (which happens when you set the "next {document name} number" value in the settings). Numbers may have been assigned to orders before this.</p>
+			<p><?php _e('Below is a list of all the document numbers generated since the last reset (which happens when you set the "next {document name} number" value in the settings). Numbers may have been assigned to orders before this.', 'woocommerce-pdf-ips-number-tools'); ?></p>
 			<div>
 				<form id="wpo_wcpdf_number_tools-filter" method="get" action="<?= add_query_arg( array() ) ?>">
 					<?php
@@ -205,7 +216,7 @@ class WPO_WCPDF_Number_Tools {
 						$value = isset( $_GET[$query_arg]) ? $_GET[$query_arg] : '';
 						printf('<input type="hidden" name="%s" value="%s" />', $query_arg, $value);
 					}
-					$list_table->search_box( __( 'Search number', 'woocommerce-pdf-ips-number-tools' ), 'wpo_wcpdf_number_tools' );
+					$list_table->search_box( __( 'Search number', 'woocommerce-pdf-ips-number-tools' ), 'woocommerce-pdf-ips-number-tools' );
 					?>
 				</form>
 			
@@ -215,7 +226,7 @@ class WPO_WCPDF_Number_Tools {
 			</div>	
 		<?php else : ?>
 			<div class="notice notice-info inline">
-				<p><?php _e( 'Please select a number store!', 'wpo_wcpdf_number_tools' ); ?></p>
+				<p><?php _e( 'Please select a number store!', 'woocommerce-pdf-ips-number-tools' ); ?></p>
 			</div>
 		<?php endif; ?>
 		<?php
@@ -323,35 +334,35 @@ class WPO_WCPDF_Number_Tools {
 			<form id="number-tools" >
 
 				<div class="renumber-invoices">
-					<strong class="name">Renumber existing PDF invoices</strong>
-					<p class="description">This tool will renumber existing PDF invoices within the selected order date range, while keeping the assigned invoice date.<br>Set the "next invoice number" setting (WooCommerce > PDF Invoices > Documents > Invoice) to the number you want to use for the first invoice.</p>
+					<strong class="name"><?php _e('Renumber existing PDF invoices', 'woocommerce-pdf-ips-number-tools'); ?></strong>
+					<p class="description"><?php _e('This tool will renumber existing PDF invoices within the selected order date range, while keeping the assigned invoice date.', 'woocommerce-pdf-ips-number-tools'); ?><br><?php _e('Set the "next invoice number" setting (WooCommerce > PDF Invoices > Documents > Invoice) to the number you want to use for the first invoice.', 'woocommerce-pdf-ips-number-tools'); ?></p>
 						<div class="date-range">
-							<span>From:</span>
-							<input type="text" id="renumber-date-from" name="renumber-date-from" value="<?php echo date('Y-m-d'); ?>" size="10"><span class="add-info">(as: yyyy-mm-dd)</span>
+							<span><?php _e('From:', 'woocommerce-pdf-ips-number-tools'); ?></span>
+							<input type="text" id="renumber-date-from" name="renumber-date-from" value="<?php echo date('Y-m-d'); ?>" size="10"><span class="add-info"><?php _e('(as: yyyy-mm-dd)', 'woocommerce-pdf-ips-number-tools'); ?></span>
 						</div>
 						<div class="date-range">
-							<span>To:</span>
-							<input type="text" id="renumber-date-to" name="renumber-date-to" value="<?php echo date('Y-m-d'); ?>" size="10"><span class="add-info">(as: yyyy-mm-dd)</span>
+							<span><?php _e('To:', 'woocommerce-pdf-ips-number-tools'); ?></span>
+							<input type="text" id="renumber-date-to" name="renumber-date-to" value="<?php echo date('Y-m-d'); ?>" size="10"><span class="add-info"><?php _e('(as: yyyy-mm-dd)', 'woocommerce-pdf-ips-number-tools'); ?></span>
 						</div>
-						<button class="button button-large number-tools-btn" id="renumber-invoices-btn">Renumber invoices</button>
+						<button class="button button-large number-tools-btn" id="renumber-invoices-btn"><?php _e('Renumber invoices', 'woocommerce-pdf-ips-number-tools'); ?></button>
 						<div class="spinner renumber-spinner"></div>
-					<p class="warning"><strong>IMPORTANT:</strong> Create a backup before using this tool, the actions it performs are irreversable!</p>
+					<p class="warning"><?php _e('<strong>IMPORTANT:</strong> Create a backup before using this tool, the actions it performs are irreversable!', 'woocommerce-pdf-ips-number-tools'); ?></p>
 				</div>
 
 				<div class="delete-invoices">
-					<strong class="name">Delete existing PDF invoices</strong>
-					<p class="description">This tool will delete existing PDF invoices within the selected order date range.</p>
+					<strong class="name"><?php _e('Delete existing PDF invoices', 'woocommerce-pdf-ips-number-tools'); ?></strong>
+					<p class="description"><?php _e('This tool will delete existing PDF invoices within the selected order date range.', 'woocommerce-pdf-ips-number-tools'); ?></p>
 					<div class="date-range">
-						<span>From:</span>
-						<input type="text" id="delete-date-from" name="delete-date-from" value="<?php echo date('Y-m-d'); ?>" size="10"><span class="add-info">(as: yyyy-mm-dd)</span>
+						<span><?php _e('From:', 'woocommerce-pdf-ips-number-tools'); ?></span>
+						<input type="text" id="delete-date-from" name="delete-date-from" value="<?php echo date('Y-m-d'); ?>" size="10"><span class="add-info"><?php _e('(as: yyyy-mm-dd)', 'woocommerce-pdf-ips-number-tools'); ?></span>
 					</div>
 					<div class="date-range">
-						<span>To:</span>
-						<input type="text" id="delete-date-to" name="delete-date-to" value="<?php echo date('Y-m-d'); ?>" size="10"><span class="add-info">(as: yyyy-mm-dd)</span>
+						<span><?php _e('To:', 'woocommerce-pdf-ips-number-tools'); ?></span>
+						<input type="text" id="delete-date-to" name="delete-date-to" value="<?php echo date('Y-m-d'); ?>" size="10"><span class="add-info"><?php _e('(as: yyyy-mm-dd)', 'woocommerce-pdf-ips-number-tools'); ?></span>
 					</div>
-					<button class="button button-large number-tools-btn" id="delete-invoices-btn">Delete invoices</button>
+					<button class="button button-large number-tools-btn" id="delete-invoices-btn"><?php _e('Delete invoices', 'woocommerce-pdf-ips-number-tools'); ?></button>
 					<div class="spinner delete-spinner"></div>
-					<p class="warning"><strong>IMPORTANT:</strong> Create a backup before using this tool, the actions it performs are irreversable!</p>
+					<p class="warning"><?php _e('<strong>IMPORTANT:</strong> Create a backup before using this tool, the actions it performs are irreversable!', 'woocommerce-pdf-ips-number-tools'); ?></p>
 				</div>
 
 			</form>
@@ -369,7 +380,7 @@ function wpo_wcpdf_renumber_or_delete_invoices() {
 	$page_count = $_POST['page_count'];
 	$invoice_count = $_POST['invoice_count'];
 	$delete_or_renumber = $_POST['delete_or_renumber'];
-	$message = $delete_or_renumber == 'delete' ? ' invoices deleted.' : ' invoices renumbered.';
+	$message = $delete_or_renumber == 'delete' ? ' ' . __('invoices deleted.', 'woocommerce-pdf-ips-number-tools') : ' ' . __('invoices renumbered.', 'woocommerce-pdf-ips-number-tools');
 	$finished = false;
 
 	$args = array(
