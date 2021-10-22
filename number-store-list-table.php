@@ -151,13 +151,17 @@ class WPO_WCPDF_Number_Tools_List_Table extends \WP_List_Table {
 	 * @return array $columns Array of all the list table columns
 	 */
 	public function get_columns() {
-		return apply_filters( 'wpo_wcpdf_number_tools_columns', array(
+		$columns = array(
 			'number'            => __( 'Number',           'woocommerce-pdf-ips-number-tools' ),
 			'calculated_number' => __( 'Calculated',       'woocommerce-pdf-ips-number-tools' ),
 			'date'              => __( 'Date',             'woocommerce-pdf-ips-number-tools' ),
 			'order'             => __( 'Order',            'woocommerce-pdf-ips-number-tools' ),
 			'order_status'      => __( 'Order Status',           'woocommerce-pdf-ips-number-tools' ),
-		) );
+		);
+		if (!isset( WPO_WCPDF()->settings->debug_settings['calculate_document_numbers'] ) ) {
+			unset($columns['calculated_number']);
+		}
+		return apply_filters( 'wpo_wcpdf_number_tools_columns', $columns );
 	}
 
 	/**
