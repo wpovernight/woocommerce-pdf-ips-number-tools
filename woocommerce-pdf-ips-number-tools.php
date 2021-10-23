@@ -155,8 +155,7 @@ class WPO_WCPDF_Number_Tools {
 		if ( isset( $_GET['table_name'] ) ) {
 			$selected_table_name = $_GET['table_name'];
 		} else {
-			$year = date('Y');
-			$_GET['table_name'] = $selected_table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_name}_{$year}", $store_name, null ); // i.e. wp_wcpdf_invoice_number or wp_wcpdf_invoice_number_2021
+			$_GET['table_name'] = $selected_table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_name}", $store_name, null ); // i.e. wp_wcpdf_invoice_number or wp_wcpdf_invoice_number_2021
 			if( ! isset( $number_store_tables[ $_GET['table_name'] ] ) ) {
 				$_GET['table_name'] = $selected_table_name = null;
 			}
@@ -224,21 +223,47 @@ class WPO_WCPDF_Number_Tools {
 	private function get_number_store_tables() {
 		global $wpdb;
 		$tables = $wpdb->get_results( "SHOW TABLES LIKE '{$wpdb->prefix}wcpdf_%'" );
-
-		$store_names = array();
+		$document_titles = $this->get_document_titles();
+		$table_names = array();
 		foreach( $tables as $table ) {
-			foreach( $table as $name ) {
-				if ( ! empty ( $name ) ) {
-					$nice_name = str_replace( array( "{$wpdb->prefix}wcpdf_", "_number" ), '', $name );
-					$nice_name = ucwords( str_replace( array( "__", "_" ), ' ', $nice_name ) );
-					$store_names[ $name ] = $nice_name;
+			foreach( $table as $table_name ) {
+				if ( ! empty ( $table_name ) ) {
+					// strip the default prefix
+					$store_name = $full_store_name = substr( $table_name, strpos( $table_name, 'wcpdf_' ) + strlen( 'wcpdf_' ) );
+					// strip year suffix, if present
+					if ( is_numeric( substr( $full_store_name, -4 ) ) ) {
+						$store_name = trim( substr( $full_store_name, 0, -4 ), '_' );
+					}
+					// strip '_number' and other remaining suffixes
+					$suffix = substr( $full_store_name, strpos( $full_store_name, '_number' ) + strlen( '_number' ) );
+					$clean_suffix = trim( str_replace( '_number', '', $suffix ), '_' );
+					$name = substr( $store_name, 0, strpos( $store_name, '_number' ) );
+					if ( ! empty ( $document_titles[$name] ) ) {
+						$title = $document_titles[$name];
+					} else {
+						$title = ucwords( str_replace( array( "__", "_", "-" ), ' ', $name ) );
+					}
+					if ( ! empty ( $suffix ) ) {
+						$title = "{$title} ({$clean_suffix})";
+					}
+					$table_names[ $table_name ] = $title;
 				}
 			}
 		}
 
-		ksort( $store_names );
+		ksort( $table_names );
 
-		return $store_names;
+		return $table_names;
+	}
+
+	private function get_document_titles() {
+		$titles = array();
+		foreach ( WPO_WCPDF()->documents->get_documents() as $document ) {
+			$title = $document->get_title();
+			$titles[$document->slug] = $title;
+			$titles[$document->type] = $title;
+		}
+		return $titles;
 	}
 
 	public function number_tools() {
