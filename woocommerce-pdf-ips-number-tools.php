@@ -116,7 +116,7 @@ class WPO_WCPDF_Number_Tools {
 	}
 
 	public function number_tools_tab( $tabs ) {
-		$tabs['number_tools'] = 'Number Tools';
+		$tabs['number_tools'] = __( 'Number Tools', 'woocommerce-pdf-ips-number-tools' );
 		return $tabs;
 	}
 
