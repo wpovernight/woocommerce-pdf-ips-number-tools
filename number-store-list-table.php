@@ -124,27 +124,6 @@ class WPO_WCPDF_Number_Tools_List_Table extends \WP_List_Table {
 	}
 
 	/**
-	 * Retrieve the view types
-	 *
-	 * @access public
-	 * @since 2.0
-	 *
-	 * @return array $views All the views available
-	 */
-	public function get_views() {
-		$base          = $this->get_base_url();
-		$current       = isset( $_GET['number_store'] ) ? sanitize_key( $_GET['number_store'] ) : 'invoice_number';
-
-		return array(
-			'invoice_number' => sprintf( '<a href="%s"%s>%s</a>',
-				esc_url( remove_query_arg( 'number_store', $base ) ),
-				$current == 'invoice_number' ? ' class="current"' : '',
-				'Invoice'
-			),
-		);
-	}
-
-	/**
 	 * Retrieve the table columns
 	 *
 	 * @since 2.0
@@ -240,7 +219,7 @@ class WPO_WCPDF_Number_Tools_List_Table extends \WP_List_Table {
 
 		if( ! empty( $table_name ) ) {
 			if ( $search ) {
-				$results = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name WHERE `id` LIKE $search OR `order_id` LIKE $search ORDER BY $orderby $order LIMIT %d OFFSET %d", $this->per_page, $offset));
+				$results = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name WHERE `id` LIKE '$search' OR `order_id` LIKE '$search' ORDER BY $orderby $order LIMIT %d OFFSET %d", $this->per_page, $offset));
 			} else {
 				$results = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name ORDER BY $orderby $order LIMIT %d OFFSET %d", $this->per_page, $offset));
 			}
@@ -276,7 +255,7 @@ class WPO_WCPDF_Number_Tools_List_Table extends \WP_List_Table {
 
 			$this->items = $this->get_numbers();
 			if ( $search = $this->get_search() ) {
-				$total_items = $wpdb->get_var("SELECT COUNT(id) FROM {$table_name}  WHERE `id` LIKE $search OR `order_id` LIKE $search");
+				$total_items = $wpdb->get_var("SELECT COUNT(id) FROM {$table_name}  WHERE `id` LIKE '$search' OR `order_id` LIKE '$search'");
 			} else {
 				$total_items = $wpdb->get_var("SELECT COUNT(id) FROM {$table_name}");
 			}

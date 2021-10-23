@@ -210,7 +210,7 @@ class WPO_WCPDF_Number_Tools {
 			<div>
 				<form id="wpo_wcpdf_number_tools-filter" method="get" action="<?= add_query_arg( array() ) ?>">
 					<?php
-					$query_args = array( 'page', 'tab', 'section', 'number_store' );
+					$query_args = array( 'page', 'tab', 'section', 'table_name' );
 					foreach ($query_args as $query_arg) {
 						$value = isset( $_GET[$query_arg]) ? $_GET[$query_arg] : '';
 						printf('<input type="hidden" name="%s" value="%s" />', $query_arg, $value);
