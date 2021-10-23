@@ -215,7 +215,7 @@ class WPO_WCPDF_Number_Tools {
 						$value = isset( $_GET[$query_arg]) ? $_GET[$query_arg] : '';
 						printf('<input type="hidden" name="%s" value="%s" />', $query_arg, $value);
 					}
-					$list_table->search_box( __( 'Search number', 'woocommerce-pdf-ips-number-tools' ), 'woocommerce-pdf-ips-number-tools' );
+					$list_table->search_box( __( 'Search number', 'woocommerce-pdf-ips-number-tools' ), 'wpo_wcpdf_number_tools' );
 					?>
 				</form>
 			
