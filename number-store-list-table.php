@@ -77,7 +77,7 @@ class WPO_WCPDF_Number_Tools_List_Table extends \WP_List_Table {
 	 *
 	 * @since 2.0
 	 *
-	 * @param array $item Contains all the data of the numbers
+	 * @param object $item Contains all the data of the numbers
 	 * @param string $column_name The name of the column
 	 *
 	 * @return string Column Name
@@ -89,24 +89,34 @@ class WPO_WCPDF_Number_Tools_List_Table extends \WP_List_Table {
 				$value = $item->id;
 				break;
 			case 'calculated_number' :
-				$value = isset($result->calculated_number) ? $item->calculated_number : '-';
+				$value = isset( $item->calculated_number ) ? $item->calculated_number : '-';
 				break;
 			case 'date' :
 				$value = $item->date;
 				break;	
 			case 'order' :
-				if ( !empty( $item->order_id ) ) {
-					$url = sprintf('post.php?post=%s&action=edit', $item->order_id);
-					$value = sprintf('<a href="%s">#%s</a>', $url, $item->order_id);
+				if ( ! empty( $item->order_id ) ) {
+					$order = $this->get_base_order( wc_get_order( $item->order_id ) );
+					$order_number = is_callable( array( $order, 'get_order_number' ) ) ? $order->get_order_number() : $item->order_id;
+					$order_id = is_callable( array( $order, 'get_id' ) ) ? $order->get_id() : $item->order_id;
+					$url = sprintf( 'post.php?post=%s&action=edit', $order_id );
+					$value = sprintf( '<a href="%s">#%s</a>', $url, $order_number );
+					if ( $order_id != $item->order_id ) {
+						$value .= sprintf( ' (%s #%s)', __('Refund:', 'woocommerce-pdf-ips-number-tools'), $item->order_id );
+					} else {
+					}
 				} else {
 					$value = '-';
 				}
 				break;
 			case 'order_status' :
-				$order = wc_get_order( $item->order_id );
-				if (!empty($order)) {
-					$order_status = $order->get_status();
-					$value = sprintf( '<mark class="order-status %s"><span>%s</span></mark>', esc_attr( sanitize_html_class( 'status-' . $order->get_status() ) ), esc_html( wc_get_order_status_name( $order->get_status() ) ) );
+				$order = $this->get_base_order( wc_get_order( $item->order_id ) );
+				if ( ! empty( $order ) ) {
+					$value = sprintf(
+						'<mark class="order-status %s"><span>%s</span></mark>',
+						esc_attr( sanitize_html_class( 'status-' . $order->get_status() ) ),
+						esc_html( wc_get_order_status_name( $order->get_status() ) )
+					);
 				} else {
 					$value = '<strong>' . __('Unknown', 'woocommerce-pdf-ips-number-tools') .'</strong>';
 				}
@@ -269,5 +279,20 @@ class WPO_WCPDF_Number_Tools_List_Table extends \WP_List_Table {
 			'total_items' => $total_items,
 			'per_page'    => $this->per_page
 		) );
+	}
+
+	/**
+	 * Get the parent order for refunds
+	 *
+	 * @since 2.4
+	 * @param $order WC_Order
+	 * @return $order WC_Order
+	 */
+	public function get_base_order( $order ) {
+		if ( is_callable( array( $order, 'get_type' ) ) && $order->get_type() == 'shop_order_refund' ) {
+			return wc_get_order( $order->get_parent_id() );
+		} else {
+			return $order;
+		}
 	}
 }
