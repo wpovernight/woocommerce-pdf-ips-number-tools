@@ -132,7 +132,7 @@ class WPO_WCPDF_Number_Tools {
 			'tools'   => __( 'Tools', 'woocommerce-pdf-ips-number-tools' ),
 		];
 		?>
-		<div class="wcpdf-number-tools-sections">
+		<div class="wcpdf-settings-sections">
 			<ul>
 				<?php
 				foreach ($sections as $section => $title) {
