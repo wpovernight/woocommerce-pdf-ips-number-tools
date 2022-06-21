@@ -137,7 +137,7 @@ class WPO_WCPDF_Number_Tools {
 				<?php
 				foreach ($sections as $section => $title) {
 					$url = remove_query_arg( 's', add_query_arg( 'section', $section ) );
-					printf('<li><a href="%s" class="%s">%s</a></li>', $url, $section == $active_section ? 'active' : '', $title );
+					printf('<li><a href="%s" class="%s">%s</a></li>', esc_url( $url ), $section == $active_section ? 'active' : '', $title );
 				}
 				?>
 			</ul>
@@ -180,7 +180,7 @@ class WPO_WCPDF_Number_Tools {
 				<tr>
 					<th scope="row"><?php _e( 'Choose a number store', 'woocommerce-pdf-ips-number-tools' ); ?></th>
 					<td>
-						<form id="wpo_wcpdf_number_tools-store" method="get" action="<?= add_query_arg( array() ) ?>">
+						<form id="wpo_wcpdf_number_tools-store" method="get" action="<?= esc_url( add_query_arg( array() ) ) ?>">
 							<select name="table_name">
 								<option selected disabled><?php _e( 'Select…', 'woocommerce-pdf-ips-number-tools' ); ?></option>
 								<?php foreach( $number_store_tables as $table_name => $title ) : ?>
@@ -208,7 +208,7 @@ class WPO_WCPDF_Number_Tools {
 		<?php if( ! empty( $selected_table_name ) && ! empty( $number_store_tables[$selected_table_name] ) ) : ?>
 			<p><?php _e('Below is a list of all the document numbers generated since the last reset (which happens when you set the "next {document name} number" value in the settings). Numbers may have been assigned to orders before this.', 'woocommerce-pdf-ips-number-tools'); ?></p>
 			<div>
-				<form id="wpo_wcpdf_number_tools-filter" method="get" action="<?= add_query_arg( array() ) ?>">
+				<form id="wpo_wcpdf_number_tools-filter" method="get" action="<?= esc_url( add_query_arg( array() ) ) ?>">
 					<?php
 					$query_args = array( 'page', 'tab', 'section', 'table_name' );
 					foreach ($query_args as $query_arg) {
