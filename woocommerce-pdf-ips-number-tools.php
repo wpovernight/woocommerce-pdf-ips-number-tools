@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: WooCommerce PDF Invoices & Packing Slips Number Tools
+ * Plugin Name: PDF Invoices & Packing Slips for WooCommerce - Number Tools
  * Plugin URI: https://www.wpovernight.com/
  * Description: Provides debugging tools for invoice numbers
  * Version: 2.4.1
@@ -67,7 +67,7 @@ class WPO_WCPDF_Number_Tools {
 
 	public function deactivate_extension_notice() {
 		if( $activation_timestamp = get_transient( 'wpo_wcpdf_number_tools_activated' ) ) {
-			$message         = __( "The <strong>Number Tools</strong> extension for <strong>WooCommerce PDF Invoices & Packing Slips</strong> has been active for more than a week now. If you don't plan to use it, we recommend that you remove it from your site!", 'woocommerce-pdf-ips-number-tools' );
+			$message         = __( "The <strong>Number Tools</strong> extension for <strong>PDF Invoices & Packing Slips for WooCommerce</strong> has been active for more than a week now. If you don't plan to use it, we recommend that you remove it from your site!", 'woocommerce-pdf-ips-number-tools' );
 			$activation_date = new DateTime();
 			$activation_date->setTimestamp( $activation_timestamp );
 			$current_date    = new DateTime( 'now' );
