@@ -371,7 +371,7 @@ class WPO_WCPDF_Number_Tools {
 						</div>
 						<button class="button button-large number-tools-btn" id="renumber-invoices-btn"><?php _e('Renumber invoices', 'woocommerce-pdf-ips-number-tools'); ?></button>
 						<div class="spinner renumber-spinner"></div>
-					<p class="warning"><?php _e('<strong>IMPORTANT:</strong> Create a backup before using this tool, the actions it performs are irreversable!', 'woocommerce-pdf-ips-number-tools'); ?></p>
+					<p class="warning"><?php _e('<strong>IMPORTANT:</strong> Create a backup before using this tool, the actions it performs are irreversible!', 'woocommerce-pdf-ips-number-tools'); ?></p>
 				</div>
 
 				<div class="delete-invoices">
@@ -387,7 +387,7 @@ class WPO_WCPDF_Number_Tools {
 					</div>
 					<button class="button button-large number-tools-btn" id="delete-invoices-btn"><?php _e('Delete invoices', 'woocommerce-pdf-ips-number-tools'); ?></button>
 					<div class="spinner delete-spinner"></div>
-					<p class="warning"><?php _e('<strong>IMPORTANT:</strong> Create a backup before using this tool, the actions it performs are irreversable!', 'woocommerce-pdf-ips-number-tools'); ?></p>
+					<p class="warning"><?php _e('<strong>IMPORTANT:</strong> Create a backup before using this tool, the actions it performs are irreversible!', 'woocommerce-pdf-ips-number-tools'); ?></p>
 				</div>
 
 			</form>
