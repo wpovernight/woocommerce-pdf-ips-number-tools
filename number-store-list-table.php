@@ -163,7 +163,7 @@ class WPO_WCPDF_Number_Tools_List_Table extends \WP_List_Table {
 		if( ! isset( $_GET['table_name'] ) ||
 			( isset( $_GET['table_name'] ) && 'wp_wcpdf_invoice_number' === $_GET['table_name'] )
 		) {
-			$columns['date_display'] =  __( 'Display invoice date', 'woocommerce-pdf-ips-number-tools' );
+			$columns['date_display'] =  __( 'Display Invoice Date', 'woocommerce-pdf-ips-number-tools' );
 		}
 		return apply_filters( 'wpo_wcpdf_number_tools_columns', $columns );
 	}
