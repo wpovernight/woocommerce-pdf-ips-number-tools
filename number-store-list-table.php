@@ -72,6 +72,7 @@ class WPO_WCPDF_Number_Tools_List_Table extends \WP_List_Table {
 		<?php
 	}
 
+	
 	/**
 	 * This function renders most of the columns in the list table.
 	 *
@@ -124,8 +125,8 @@ class WPO_WCPDF_Number_Tools_List_Table extends \WP_List_Table {
 			case 'date_display' :
 				$order = $this->get_base_order( wc_get_order( $item->order_id ) );
 				if ( ! empty( $order ) ) {
-					$value = $order->get_meta( '_wcpdf_invoice_display_date' );
-					
+					$invoice = wcpdf_get_document( 'invoice', $order );
+				 	$value = $invoice->document_display_date();
 				} else {
 					$value = '<strong>' . __('Unknown', 'woocommerce-pdf-ips-number-tools') .'</strong>';
 				}
