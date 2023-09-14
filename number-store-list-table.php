@@ -231,7 +231,7 @@ class WPO_WCPDF_Number_Tools_List_Table extends \WP_List_Table {
 		
 		// remove db document numbers that don't exist more in the orders meta (documents were deleted)
 		if ( ! empty( $results ) && ! empty( $table_name ) ) {
-			$document_type = str_replace( 'wp_wcpdf_', '', $table_name );
+			$document_type = str_replace( "{$wpdb->prefix}wcpdf_", '', $table_name );
 			$document_type = str_replace( '_number', '', $document_type );
 			$document_type = str_replace( '_', '-', $document_type );
 			
