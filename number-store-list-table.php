@@ -211,30 +211,41 @@ class WPO_WCPDF_Number_Tools_List_Table extends \WP_List_Table {
 	public function get_numbers() {
 		global $wpdb;
 
-		$results      = array();
-		$paged        = $this->get_paged();
-		$offset       = $this->per_page * ( $paged - 1 );
-		$search       = $this->get_search();
-		$table_name   = isset( $_GET['table_name']  ) ? sanitize_text_field( $_GET['table_name']  ) : null;
-		$order        = isset( $_GET['order']   ) ? sanitize_text_field( $_GET['order']   ) : 'DESC';
-		$orderby      = isset( $_GET['orderby'] ) ? sanitize_text_field( $_GET['orderby'] ) : 'id';
+		$results    = array();
+		$paged      = $this->get_paged();
+		$offset     = $this->per_page * ( $paged - 1 );
+		$search     = $this->get_search();
+		$table_name = isset( $_GET['table_name']  ) ? sanitize_text_field( $_GET['table_name']  ) : null;
+		$order      = isset( $_GET['order']   ) ? sanitize_text_field( $_GET['order']   ) : 'DESC';
+		$orderby    = isset( $_GET['orderby'] ) ? sanitize_text_field( $_GET['orderby'] ) : 'id';
 
-		// $args    = array(
-		// 	'number'  => $this->per_page,
-		// 	'offset'  => $offset,
-		// 	'order'   => $order,
-		// 	'orderby' => $orderby,
-		// 	'status'  => $status
-		// );
-
-		if( ! empty( $table_name ) ) {
+		if ( ! empty( $table_name ) ) {
 			if ( $search ) {
-				$results = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name WHERE `id` LIKE '$search' OR `order_id` LIKE '$search' ORDER BY $orderby $order LIMIT %d OFFSET %d", $this->per_page, $offset));
+				$results = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $table_name WHERE `id` LIKE '$search' OR `order_id` LIKE '$search' ORDER BY $orderby $order LIMIT %d OFFSET %d", $this->per_page, $offset ) );
 			} else {
-				$results = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name ORDER BY $orderby $order LIMIT %d OFFSET %d", $this->per_page, $offset));
+				$results = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $table_name ORDER BY $orderby $order LIMIT %d OFFSET %d", $this->per_page, $offset ) );
 			}
 		} else {
-			$results = 0;
+			$results = array();
+		}
+		
+		// remove db document numbers that don't exist more in the orders meta (documents were deleted)
+		if ( ! empty( $results ) && ! empty( $table_name ) ) {
+			$document_type = str_replace( 'wp_wcpdf_', '', $table_name );
+			$document_type = str_replace( '_number', '', $document_type );
+			$document_type = str_replace( '_', '-', $document_type );
+			
+			foreach ( $results as $key => $result ) {
+				$result = (array) $result;
+				
+				if ( isset( $result['order_id'] ) && ! empty( $document_type ) ) {
+					$document = wcpdf_get_document( $document_type, wc_get_order( absint( $result['order_id'] ) ) );
+					
+					if ( $document && empty( $document->get_number() ) ) {
+						unset( $results[ $key ] );
+					}	
+				}
+			}
 		}
 
 		return $results;
