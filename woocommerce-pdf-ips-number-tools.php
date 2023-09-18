@@ -332,7 +332,7 @@ class WPO_WCPDF_Number_Tools {
 							'security':           '<?php echo $number_tools_nonce; ?>'
 						};
 
-						$.ajax({
+						$.ajax( {
 							type:     'POST',
 							url:      ajaxurl,
 							data:     data,
@@ -340,8 +340,10 @@ class WPO_WCPDF_Number_Tools {
 							success: function( response ) {
 								if ( false === response.data.finished ) {
 									// update page count and invoice count
+									documentType  = response.data.documentType;
 									pageCount     = response.data.pageCount;
 									documentCount = response.data.documentCount;
+									
 									// recall function
 									renumberOrDeleteDocuments( documentType, dateFrom, dateTo, pageCount, documentCount, deleteOrRenumber );
 									
@@ -447,7 +449,7 @@ function wpo_wcpdf_renumber_or_delete_invoices() {
 	$results   = wc_get_orders( $args );
 	$order_ids = $results->orders;
 	
-	if ( ! empty( $order_ids ) ) {
+	if ( ! empty( $order_ids ) && ! empty( $document_type ) ) {
 		foreach ( $order_ids as $order_id ) {
 			$order = wc_get_order( $order_id );
 			
@@ -476,6 +478,7 @@ function wpo_wcpdf_renumber_or_delete_invoices() {
 
 	$response = array(
 		'finished'      => $finished,
+		'documentType'  => $document_type,
 		'pageCount'     => $page_count,
 		'documentCount' => $document_count,
 		'message'       => $message,
