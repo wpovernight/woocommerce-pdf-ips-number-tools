@@ -1,12 +1,12 @@
 <?php
 /**
  * Plugin Name: PDF Invoices & Packing Slips for WooCommerce - Number Tools
- * Plugin URI: https://www.wpovernight.com/
- * Description: Provides debugging tools for invoice numbers
- * Version: 2.4.2
- * Author: Ewout Fernhout
- * Author URI: https://www.wpovernight.com/
- * License: GPLv2 or later
+ * Plugin URI:  https://www.wpovernight.com/
+ * Description: Provides debugging tools for document numbers
+ * Version:     2.4.2
+ * Author:      WP Overnight
+ * Author URI:  https://www.wpovernight.com/
+ * License:     GPLv2 or later
  * License URI: http://www.opensource.org/licenses/gpl-license.php
  * Text Domain: woocommerce-pdf-ips-number-tools
  */
@@ -41,7 +41,7 @@ class WPO_WCPDF_Number_Tools {
 		add_action( 'admin_enqueue_scripts', array( $this, 'load_scripts_styles' ) ); // Load scripts & styles
 		add_action( 'wpo_wcpdf_settings_output_number_tools', '__return_true', 10, 1);
 		add_action( 'wpo_wcpdf_after_settings_page', array( $this, 'number_tools_page' ), 10, 2);
-		add_action( 'wp_ajax_renumber_or_delete_invoices', 'wpo_wcpdf_renumber_or_delete_invoices' );
+		add_action( 'wp_ajax_renumber_or_delete_documents', 'wpo_wcpdf_renumber_or_delete_documents' );
 		add_action( 'admin_notices', array( $this, 'deactivate_extension_notice' ) );
 
 		// on activation
@@ -322,7 +322,7 @@ class WPO_WCPDF_Number_Tools {
 
 					function renumberOrDeleteDocuments( documentType, dateFrom, dateTo, pageCount, documentCount, deleteOrRenumber ) {
 						let data = {
-							'action':             'renumber_or_delete_invoices',
+							'action':             'renumber_or_delete_documents',
 							'delete_or_renumber': deleteOrRenumber,
 							'document_type':      documentType,
 							'date_from':          dateFrom,
@@ -339,8 +339,7 @@ class WPO_WCPDF_Number_Tools {
 							dataType: 'json',
 							success: function( response ) {
 								if ( false === response.data.finished ) {
-									// update page count and invoice count
-									documentType  = response.data.documentType;
+									// update page count and document count
 									pageCount     = response.data.pageCount;
 									documentCount = response.data.documentCount;
 									
@@ -426,7 +425,7 @@ class WPO_WCPDF_Number_Tools {
 	}
 }
 
-function wpo_wcpdf_renumber_or_delete_invoices() {
+function wpo_wcpdf_renumber_or_delete_documents() {
 	check_ajax_referer( 'wpo_wcpdf_number_tools_nonce', 'security' );
 
 	$from_date          = date_i18n( 'Y-m-d', strtotime( $_POST['date_from'] ) );
@@ -482,7 +481,6 @@ function wpo_wcpdf_renumber_or_delete_invoices() {
 
 	$response = array(
 		'finished'      => $finished,
-		'documentType'  => $document_type,
 		'pageCount'     => $page_count,
 		'documentCount' => $document_count,
 		'message'       => $message,
