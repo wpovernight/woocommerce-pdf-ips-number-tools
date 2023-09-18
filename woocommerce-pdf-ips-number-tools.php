@@ -350,7 +350,7 @@ class WPO_WCPDF_Number_Tools {
 								} else {
 									$( '.renumber-spinner, .delete-spinner' ).css( 'visibility', 'hidden' );
 									$( '#renumber-documents-btn, #delete-documents-btn' ).removeAttr( 'disabled' );
-									$( '#renumber-document-type, #renumber-date-from, #renumber-date-to, #delete-document-type, #delete-date-from, #delete-date-to' ).removeProp( 'disabled' );
+									$( '#renumber-document-type, #renumber-date-from, #renumber-date-to, #delete-document-type, #delete-date-from, #delete-date-to' ).prop( 'disabled', false );
 									let message = response.data.message;
 									alert( documentCount + message );
 								}
@@ -429,10 +429,11 @@ function wpo_wcpdf_renumber_or_delete_invoices() {
 	$from_date          = date_i18n( 'Y-m-d', strtotime( $_POST['date_from'] ) );
 	$to_date            = date_i18n( 'Y-m-d', strtotime( $_POST['date_to'] ) );
 	$document_type      = esc_attr( $_POST['document_type'] );
+	$document_title     = ucfirst( str_replace( '-', ' ', $document_type ) );
 	$page_count         = absint( $_POST['page_count'] );
 	$document_count     = absint( $_POST['document_count'] );
 	$delete_or_renumber = esc_attr( $_POST['delete_or_renumber'] );
-	$message            = ( 'delete' === $delete_or_renumber ) ? ' ' . __( 'invoices deleted.', 'woocommerce-pdf-ips-number-tools' ) : ' ' . __( 'invoices renumbered.', 'woocommerce-pdf-ips-number-tools' );
+	$message            = ( 'delete' === $delete_or_renumber ) ? " {$document_title} " . __( 'documents deleted.', 'woocommerce-pdf-ips-number-tools' ) : " {$document_title} " . __( 'documents renumbered.', 'woocommerce-pdf-ips-number-tools' );
 	$finished           = false;
 
 	$args = array(
