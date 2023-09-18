@@ -372,7 +372,10 @@ class WPO_WCPDF_Number_Tools {
 				<?php $documents = WPO_WCPDF()->documents->get_documents( 'all' ); ?>
 				<div class="tool renumber-documents">
 					<strong class="name"><?php _e( 'Renumber existing documents', 'woocommerce-pdf-ips-number-tools' ); ?></strong>
-					<p class="description"><?php _e( 'This tool will renumber existing documents within the selected order date range, while keeping the assigned document date.', 'woocommerce-pdf-ips-number-tools' ); ?></p>
+					<p class="description">
+						<?php _e( 'This tool will renumber existing documents within the selected order date range, while keeping the assigned document date.', 'woocommerce-pdf-ips-number-tools' ); ?><br>
+						<?php _e('Set the "next document number" setting (WooCommerce > PDF Invoices > Documents > Select document) to the number you want to use for the first document.', 'woocommerce-pdf-ips-number-tools'); ?>
+					</p>
 					<div class="document-type">
 						<span><?php _e( 'Document type:', 'woocommerce-pdf-ips-number-tools' ); ?></span>
 						<select id="renumber-document-type" name="renumber-document-type">
