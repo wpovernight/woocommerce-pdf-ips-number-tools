@@ -431,7 +431,7 @@ function wpo_wcpdf_renumber_or_delete_documents() {
 	$from_date          = date_i18n( 'Y-m-d', strtotime( $_POST['date_from'] ) );
 	$to_date            = date_i18n( 'Y-m-d', strtotime( $_POST['date_to'] ) );
 	$document_type      = esc_attr( $_POST['document_type'] );
-	$document_title     = ucfirst( str_replace( '-', ' ', $document_type ) );
+	$document_title     = ucwords( str_replace( '-', ' ', $document_type ) );
 	$page_count         = absint( $_POST['page_count'] );
 	$document_count     = absint( $_POST['document_count'] );
 	$delete_or_renumber = esc_attr( $_POST['delete_or_renumber'] );
