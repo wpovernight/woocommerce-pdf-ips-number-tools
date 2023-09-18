@@ -278,116 +278,141 @@ class WPO_WCPDF_Number_Tools {
 	}
 
 	public function number_tools() {
-		$number_tools_nonce = wp_create_nonce( "wpo_wcpdf_number_tools_nonce" );
+		$number_tools_nonce = wp_create_nonce( 'wpo_wcpdf_number_tools_nonce' );
 		echo '<style type="text/css">';
 		include( plugin_dir_path( __FILE__ ) . 'css/styles.css' );
 		echo '</style>';
 		?>
 		<script>
-		jQuery(document).ready(function($) {
-			$( "#renumber-date-from, #renumber-date-to, #delete-date-from, #delete-date-to" ).datepicker({ dateFormat: 'yy-mm-dd' });
+			jQuery( document ).ready( function( $ ) {
+				$( '#renumber-date-from, #renumber-date-to, #delete-date-from, #delete-date-to' ).datepicker( { dateFormat: 'yy-mm-dd' } );
 
-			$('.number-tools-btn').click(function( event ) {
-				event.preventDefault();
+				$( '.number-tools-btn' ).click( function( event ) {
+					event.preventDefault();
 
-				let dateFrom = '';
-				let dateTo = '';
-				let deleteOrRenumber = '';
-				let pageCount = 1;
-				let invoiceCount = 0;
+					let documentType     = '';
+					let dateFrom         = '';
+					let dateTo           = '';
+					let deleteOrRenumber = '';
+					let pageCount        = 1;
+					let documentCount    = 0;
 
-				if (this.id == 'renumber-invoices-btn') {
-					dateFrom = $('#renumber-date-from').val();
-					dateTo = $('#renumber-date-to').val();
-					deleteOrRenumber = 'renumber';
-					$('.renumber-spinner').css('visibility', 'visible');
-					$('#renumber-invoices-btn, #delete-invoices-btn').attr('disabled', true)
-					$('#renumber-date-from, #renumber-date-to, #delete-date-from, #delete-date-to').prop('disabled', true);
-				} else if (this.id == 'delete-invoices-btn') {
-					dateFrom = $('#delete-date-from').val();
-					dateTo = $('#delete-date-to').val();
-					deleteOrRenumber = 'delete';
-					$('.delete-spinner').css('visibility', 'visible');
-					$('#renumber-invoices-btn, #delete-invoices-btn').attr('disabled', true)
-					$('#renumber-date-from, #renumber-date-to, #delete-date-from, #delete-date-to').prop('disabled', true);
-				}
+					if ( 'renumber-documents-btn' === this.id ) {
+						documentType     = $( '#renumber-document-type' ).val();
+						dateFrom         = $( '#renumber-date-from' ).val();
+						dateTo           = $( '#renumber-date-to' ).val();
+						deleteOrRenumber = 'renumber';
+						
+						$( '.renumber-spinner' ).css( 'visibility', 'visible' );
+					
+					} else if ( 'delete-documents-btn' === this.id ) {
+						documentType     = $( '#delete-document-type' ).val();
+						dateFrom         = $( '#delete-date-from' ).val();
+						dateTo           = $( '#delete-date-to' ).val();
+						deleteOrRenumber = 'delete';
+						
+						$( '.delete-spinner' ).css( 'visibility', 'visible' );
+					}
+					
+					$( '#renumber-documents-btn, #delete-documents-btn' ).attr( 'disabled', true );
+					$( '#renumber-document-type, #renumber-date-from, #renumber-date-to, #delete-document-type, #delete-date-from, #delete-date-to' ).prop( 'disabled', true );
 
-				//First call
-				renumberOrDeleteInvoices(dateFrom, dateTo, pageCount, invoiceCount, deleteOrRenumber);
+					// first call
+					renumberOrDeleteDocuments( documentType, dateFrom, dateTo, pageCount, documentCount, deleteOrRenumber );
 
-				function renumberOrDeleteInvoices(dateFrom, dateTo, pageCount, invoiceCount, deleteOrRenumber) {
-					let data = {
-						'action': 'renumber_or_delete_invoices',
-						'delete_or_renumber': deleteOrRenumber,
-						'date_from': dateFrom,
-						'date_to': dateTo,
-						'page_count': pageCount,
-						'invoice_count': invoiceCount,
-						'security': '<?php echo $number_tools_nonce; ?>'
-					};
+					function renumberOrDeleteDocuments( documentType, dateFrom, dateTo, pageCount, documentCount, deleteOrRenumber ) {
+						let data = {
+							'action':             'renumber_or_delete_invoices',
+							'delete_or_renumber': deleteOrRenumber,
+							'document_type':      documentType,
+							'date_from':          dateFrom,
+							'date_to':            dateTo,
+							'page_count':         pageCount,
+							'document_count':     documentCount,
+							'security':           '<?php echo $number_tools_nonce; ?>'
+						};
 
-					$.ajax({
-						type:		'POST',
-						url:		ajaxurl,
-						data:		data,
-						dataType:	'json',
-						success: function(response){
-							if (response.data.finished === false ) {
-								//update page count and invoice count
-								pageCount = response.data.pageCount;
-								invoiceCount = response.data.invoiceCount;
-								//recall function
-								renumberOrDeleteInvoices(dateFrom, dateTo, pageCount, invoiceCount, deleteOrRenumber);
-							} else {
-								$('.renumber-spinner, .delete-spinner').css('visibility', 'hidden');
-								$('#renumber-invoices-btn, #delete-invoices-btn').removeAttr('disabled');
-								$('#renumber-date-from, #renumber-date-to, #delete-date-from, #delete-date-to').removeProp('disabled');
-								let message = response.data.message;
-								alert(invoiceCount + message);
+						$.ajax({
+							type:     'POST',
+							url:      ajaxurl,
+							data:     data,
+							dataType: 'json',
+							success: function( response ) {
+								if ( false === response.data.finished ) {
+									// update page count and invoice count
+									pageCount     = response.data.pageCount;
+									documentCount = response.data.documentCount;
+									// recall function
+									renumberOrDeleteDocuments( documentType, dateFrom, dateTo, pageCount, documentCount, deleteOrRenumber );
+									
+								} else {
+									$( '.renumber-spinner, .delete-spinner' ).css( 'visibility', 'hidden' );
+									$( '#renumber-documents-btn, #delete-documents-btn' ).removeAttr( 'disabled' );
+									$( '#renumber-document-type, #renumber-date-from, #renumber-date-to, #delete-document-type, #delete-date-from, #delete-date-to' ).removeProp( 'disabled' );
+									let message = response.data.message;
+									alert( documentCount + message );
+								}
+							},
+							error: function( xhr, ajaxOptions, thrownError ) {
+								alert( xhr.status + ':'+ thrownError );
 							}
-						},
-						error: function(xhr, ajaxOptions, thrownError) {
-							alert(xhr.status+ ':'+ thrownError);
-						}
-					});
-				};
-			});
-		});
+						} );
+					};
+				} );
+			} );
 		</script> 
 
 		<div class="wpo-wcpdf-number-tools">
+			<div class="notice notice-warning inline">
+				<p><?php _e( '<strong>IMPORTANT:</strong> Create a backup before using this tools, the actions they performs are irreversible!', 'woocommerce-pdf-ips-number-tools' ); ?></p>
+			</div>
 			<form id="number-tools" >
-
-				<div class="renumber-invoices">
-					<strong class="name"><?php _e('Renumber existing PDF invoices', 'woocommerce-pdf-ips-number-tools'); ?></strong>
-					<p class="description"><?php _e('This tool will renumber existing PDF invoices within the selected order date range, while keeping the assigned invoice date.', 'woocommerce-pdf-ips-number-tools'); ?><br><?php _e('Set the "next invoice number" setting (WooCommerce > PDF Invoices > Documents > Invoice) to the number you want to use for the first invoice.', 'woocommerce-pdf-ips-number-tools'); ?></p>
-						<div class="date-range">
-							<span><?php _e('From:', 'woocommerce-pdf-ips-number-tools'); ?></span>
-							<input type="text" id="renumber-date-from" name="renumber-date-from" value="<?php echo date('Y-m-d'); ?>" size="10"><span class="add-info"><?php _e('(as: yyyy-mm-dd)', 'woocommerce-pdf-ips-number-tools'); ?></span>
-						</div>
-						<div class="date-range">
-							<span><?php _e('To:', 'woocommerce-pdf-ips-number-tools'); ?></span>
-							<input type="text" id="renumber-date-to" name="renumber-date-to" value="<?php echo date('Y-m-d'); ?>" size="10"><span class="add-info"><?php _e('(as: yyyy-mm-dd)', 'woocommerce-pdf-ips-number-tools'); ?></span>
-						</div>
-						<button class="button button-large number-tools-btn" id="renumber-invoices-btn"><?php _e('Renumber invoices', 'woocommerce-pdf-ips-number-tools'); ?></button>
-						<div class="spinner renumber-spinner"></div>
-					<p class="warning"><?php _e('<strong>IMPORTANT:</strong> Create a backup before using this tool, the actions it performs are irreversible!', 'woocommerce-pdf-ips-number-tools'); ?></p>
+				<?php $documents = WPO_WCPDF()->documents->get_documents( 'all' ); ?>
+				<div class="tool renumber-documents">
+					<strong class="name"><?php _e( 'Renumber existing documents', 'woocommerce-pdf-ips-number-tools' ); ?></strong>
+					<p class="description"><?php _e( 'This tool will renumber existing documents within the selected order date range, while keeping the assigned document date.', 'woocommerce-pdf-ips-number-tools' ); ?></p>
+					<div class="document-type">
+						<span><?php _e( 'Document type:', 'woocommerce-pdf-ips-number-tools' ); ?></span>
+						<select id="renumber-document-type" name="renumber-document-type">
+							<option value=""><?php _e( 'Select', 'woocommerce-pdf-ips-number-tools' ); ?>...</option>
+							<?php foreach ( $documents as $document ) : ?>
+								<option value="<?php echo $document->get_type(); ?>"><?php echo $document->get_title(); ?></option>
+							<?php endforeach; ?>
+						</select>
+					</div>
+					<div class="date-range">
+						<span><?php _e( 'From:', 'woocommerce-pdf-ips-number-tools' ); ?></span>
+						<input type="text" id="renumber-date-from" name="renumber-date-from" value="<?php echo date( 'Y-m-d' ); ?>" size="10"><span class="add-info"><?php _e( '(as: yyyy-mm-dd)', 'woocommerce-pdf-ips-number-tools' ); ?></span>
+					</div>
+					<div class="date-range">
+						<span><?php _e( 'To:', 'woocommerce-pdf-ips-number-tools' ); ?></span>
+						<input type="text" id="renumber-date-to" name="renumber-date-to" value="<?php echo date( 'Y-m-d' ); ?>" size="10"><span class="add-info"><?php _e( '(as: yyyy-mm-dd)', 'woocommerce-pdf-ips-number-tools' ); ?></span>
+					</div>
+					<button class="button button-large number-tools-btn" id="renumber-documents-btn"><?php _e( 'Renumber documents', 'woocommerce-pdf-ips-number-tools' ); ?></button>
+					<div class="spinner renumber-spinner"></div>
 				</div>
-
-				<div class="delete-invoices">
-					<strong class="name"><?php _e('Delete existing PDF invoices', 'woocommerce-pdf-ips-number-tools'); ?></strong>
-					<p class="description"><?php _e('This tool will delete existing PDF invoices within the selected order date range.', 'woocommerce-pdf-ips-number-tools'); ?></p>
-					<div class="date-range">
-						<span><?php _e('From:', 'woocommerce-pdf-ips-number-tools'); ?></span>
-						<input type="text" id="delete-date-from" name="delete-date-from" value="<?php echo date('Y-m-d'); ?>" size="10"><span class="add-info"><?php _e('(as: yyyy-mm-dd)', 'woocommerce-pdf-ips-number-tools'); ?></span>
+				<div class="tool delete-documents">
+					<strong class="name"><?php _e( 'Delete existing documents', 'woocommerce-pdf-ips-number-tools' ); ?></strong>
+					<p class="description"><?php _e( 'This tool will delete existing documents within the selected order date range.', 'woocommerce-pdf-ips-number-tools' ); ?></p>
+					<div class="document-type">
+						<span><?php _e( 'Document type:', 'woocommerce-pdf-ips-number-tools' ); ?></span>
+						<select id="delete-document-type" name="delete-document-type">
+							<option value=""><?php _e( 'Select', 'woocommerce-pdf-ips-number-tools' ); ?>...</option>
+							<?php foreach ( $documents as $document ) : ?>
+								<option value="<?php echo $document->get_type(); ?>"><?php echo $document->get_title(); ?></option>
+							<?php endforeach; ?>
+						</select>
 					</div>
 					<div class="date-range">
-						<span><?php _e('To:', 'woocommerce-pdf-ips-number-tools'); ?></span>
-						<input type="text" id="delete-date-to" name="delete-date-to" value="<?php echo date('Y-m-d'); ?>" size="10"><span class="add-info"><?php _e('(as: yyyy-mm-dd)', 'woocommerce-pdf-ips-number-tools'); ?></span>
+						<span><?php _e( 'From:', 'woocommerce-pdf-ips-number-tools' ); ?></span>
+						<input type="text" id="delete-date-from" name="delete-date-from" value="<?php echo date( 'Y-m-d' ); ?>" size="10"><span class="add-info"><?php _e( '(as: yyyy-mm-dd)', 'woocommerce-pdf-ips-number-tools' ); ?></span>
 					</div>
-					<button class="button button-large number-tools-btn" id="delete-invoices-btn"><?php _e('Delete invoices', 'woocommerce-pdf-ips-number-tools'); ?></button>
+					<div class="date-range">
+						<span><?php _e( 'To:', 'woocommerce-pdf-ips-number-tools' ); ?></span>
+						<input type="text" id="delete-date-to" name="delete-date-to" value="<?php echo date( 'Y-m-d' ); ?>" size="10"><span class="add-info"><?php _e( '(as: yyyy-mm-dd)', 'woocommerce-pdf-ips-number-tools' ); ?></span>
+					</div>
+					<button class="button button-large number-tools-btn" id="delete-documents-btn"><?php _e( 'Delete documents', 'woocommerce-pdf-ips-number-tools' ); ?></button>
 					<div class="spinner delete-spinner"></div>
-					<p class="warning"><?php _e('<strong>IMPORTANT:</strong> Create a backup before using this tool, the actions it performs are irreversible!', 'woocommerce-pdf-ips-number-tools'); ?></p>
 				</div>
 
 			</form>
@@ -397,59 +422,65 @@ class WPO_WCPDF_Number_Tools {
 }
 
 function wpo_wcpdf_renumber_or_delete_invoices() {
-	//Check nonce
 	check_ajax_referer( 'wpo_wcpdf_number_tools_nonce', 'security' );
 
-	$from_date = date_i18n( 'Y-m-d', strtotime( $_POST['date_from'] ) );
-	$to_date = date_i18n( 'Y-m-d', strtotime( $_POST['date_to'] ) );
-	$page_count = $_POST['page_count'];
-	$invoice_count = $_POST['invoice_count'];
-	$delete_or_renumber = $_POST['delete_or_renumber'];
-	$message = $delete_or_renumber == 'delete' ? ' ' . __('invoices deleted.', 'woocommerce-pdf-ips-number-tools') : ' ' . __('invoices renumbered.', 'woocommerce-pdf-ips-number-tools');
-	$finished = false;
+	$from_date          = date_i18n( 'Y-m-d', strtotime( $_POST['date_from'] ) );
+	$to_date            = date_i18n( 'Y-m-d', strtotime( $_POST['date_to'] ) );
+	$document_type      = esc_attr( $_POST['document_type'] );
+	$page_count         = absint( $_POST['page_count'] );
+	$document_count     = absint( $_POST['document_count'] );
+	$delete_or_renumber = esc_attr( $_POST['delete_or_renumber'] );
+	$message            = ( 'delete' === $delete_or_renumber ) ? ' ' . __( 'invoices deleted.', 'woocommerce-pdf-ips-number-tools' ) : ' ' . __( 'invoices renumbered.', 'woocommerce-pdf-ips-number-tools' );
+	$finished           = false;
 
 	$args = array(
-		'return'			=> 'ids',
-		'type'				=> 'shop_order',
-		'limit'				=> -1,
-		'order'				=> 'ASC',
-		'paginate'			=> true,
-		'posts_per_page' 	=> 50,
-		'page'				=> $page_count,
-		'date_created'		=> $from_date . '...' . $to_date,
+		'return'         => 'ids',
+		'type'           => 'shop_order',
+		'limit'          => -1,
+		'order'          => 'ASC',
+		'paginate'       => true,
+		'posts_per_page' => 50,
+		'page'           => $page_count,
+		'date_created'   => $from_date . '...' . $to_date,
 	);
 
-	$results = wc_get_orders( $args );
+	$results   = wc_get_orders( $args );
 	$order_ids = $results->orders;
 	
-	if ( !empty( $order_ids ) ) {
-		foreach ($order_ids as $order_id) {
+	if ( ! empty( $order_ids ) ) {
+		foreach ( $order_ids as $order_id ) {
 			$order = wc_get_order( $order_id );
-			if ( $invoice = wcpdf_get_invoice( $order ) ) {
-				if ( $invoice->exists() ) {
-					if ( $delete_or_renumber == 'renumber' ) {
-						$invoice->init_number();
-						$invoice->save();
-					} elseif ( $delete_or_renumber == 'delete' ) {
-						$invoice->delete();
-					}
-					$invoice_count++;
+			
+			if ( empty( $order ) ) {
+				continue;
+			}
+			
+			$document = wcpdf_get_document( $document_type, $order );
+			
+			if ( $document && $document->exists() ) {
+				if ( 'renumber' === $delete_or_renumber && is_callable( array( $document, 'init_number' ) ) ) {
+					$document->init_number();
+					$document->save();
+				} elseif ( 'delete' === $delete_or_renumber && is_callable( array( $document, 'delete' ) ) ) {
+					$document->delete();
 				}
+				$document_count++;
 			}
 		}
 		$page_count++;
 
-	//No more order IDs
+	// no more order IDs
 	} else {
 		$finished = true;
 	}
 
 	$response = array(
-		'finished'		=> $finished,
-		'pageCount' 	=> $page_count,
-		'invoiceCount'	=> $invoice_count,
-		'message'		=> $message
+		'finished'      => $finished,
+		'pageCount'     => $page_count,
+		'documentCount' => $document_count,
+		'message'       => $message,
 	);
+	
 	wp_send_json_success( $response );	
 		
 	wp_die(); // this is required to terminate immediately and return a proper response
