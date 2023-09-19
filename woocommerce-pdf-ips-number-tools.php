@@ -41,7 +41,7 @@ class WPO_WCPDF_Number_Tools {
 		add_action( 'admin_enqueue_scripts', array( $this, 'load_scripts_styles' ) ); // Load scripts & styles
 		add_action( 'wpo_wcpdf_settings_output_number_tools', '__return_true', 10, 1);
 		add_action( 'wpo_wcpdf_after_settings_page', array( $this, 'number_tools_page' ), 10, 2);
-		add_action( 'wp_ajax_renumber_or_delete_documents', 'wpo_wcpdf_renumber_or_delete_documents' );
+		add_action( 'wp_ajax_renumber_or_delete_documents', array( $this, 'ajax_renumber_or_delete_documents' ) );
 		add_action( 'admin_notices', array( $this, 'deactivate_extension_notice' ) );
 
 		// on activation
@@ -279,6 +279,7 @@ class WPO_WCPDF_Number_Tools {
 
 	public function number_tools() {
 		$number_tools_nonce = wp_create_nonce( 'wpo_wcpdf_number_tools_nonce' );
+		$alert_message      = __( 'Please select a document type', 'woocommerce-pdf-ips-number-tools' );
 		echo '<style type="text/css">';
 		include( plugin_dir_path( __FILE__ ) . 'css/styles.css' );
 		echo '</style>';
@@ -303,14 +304,21 @@ class WPO_WCPDF_Number_Tools {
 						dateTo           = $( '#renumber-date-to' ).val();
 						deleteOrRenumber = 'renumber';
 						
-						$( '.renumber-spinner' ).css( 'visibility', 'visible' );
-					
 					} else if ( 'delete-documents-btn' === this.id ) {
 						documentType     = $( '#delete-document-type' ).val();
 						dateFrom         = $( '#delete-date-from' ).val();
 						dateTo           = $( '#delete-date-to' ).val();
 						deleteOrRenumber = 'delete';
-						
+					}
+					
+					if ( '' === documentType || 'undefined' === documentType ) {
+						alert( '<?php echo $alert_message; ?>' );
+						return;
+					}
+					
+					if ( 'renumber' === deleteOrRenumber ) {
+						$( '.renumber-spinner' ).css( 'visibility', 'visible' );
+					} else if ( 'delete' === deleteOrRenumber ) {
 						$( '.delete-spinner' ).css( 'visibility', 'visible' );
 					}
 					
@@ -405,6 +413,7 @@ class WPO_WCPDF_Number_Tools {
 							<?php foreach ( $documents as $document ) : ?>
 								<option value="<?php echo $document->get_type(); ?>"><?php echo $document->get_title(); ?></option>
 							<?php endforeach; ?>
+							<option value="all"><?php _e( 'All', 'woocommerce-pdf-ips-number-tools' ); ?></option>
 						</select>
 					</div>
 					<div class="date-range">
@@ -423,72 +432,103 @@ class WPO_WCPDF_Number_Tools {
 		</div>
 		<?php
 	}
-}
-
-function wpo_wcpdf_renumber_or_delete_documents() {
-	check_ajax_referer( 'wpo_wcpdf_number_tools_nonce', 'security' );
-
-	$from_date          = date_i18n( 'Y-m-d', strtotime( $_POST['date_from'] ) );
-	$to_date            = date_i18n( 'Y-m-d', strtotime( $_POST['date_to'] ) );
-	$document_type      = esc_attr( $_POST['document_type'] );
-	$document_title     = ucwords( str_replace( '-', ' ', $document_type ) );
-	$page_count         = absint( $_POST['page_count'] );
-	$document_count     = absint( $_POST['document_count'] );
-	$delete_or_renumber = esc_attr( $_POST['delete_or_renumber'] );
-	$message            = ( 'delete' === $delete_or_renumber ) ? " {$document_title} " . __( 'documents deleted.', 'woocommerce-pdf-ips-number-tools' ) : " {$document_title} " . __( 'documents renumbered.', 'woocommerce-pdf-ips-number-tools' );
-	$finished           = false;
-
-	$args = array(
-		'return'         => 'ids',
-		'type'           => 'shop_order',
-		'limit'          => -1,
-		'order'          => 'ASC',
-		'paginate'       => true,
-		'posts_per_page' => 50,
-		'page'           => $page_count,
-		'date_created'   => $from_date . '...' . $to_date,
-	);
-
-	$results   = wc_get_orders( $args );
-	$order_ids = $results->orders;
 	
-	if ( ! empty( $order_ids ) && ! empty( $document_type ) ) {
-		foreach ( $order_ids as $order_id ) {
-			$order = wc_get_order( $order_id );
-			
-			if ( empty( $order ) ) {
-				continue;
-			}
-			
-			$document = wcpdf_get_document( $document_type, $order );
-			
-			if ( $document && $document->exists() ) {
-				if ( 'renumber' === $delete_or_renumber && is_callable( array( $document, 'init_number' ) ) ) {
-					$document->init_number();
-					$document->save();
-				} elseif ( 'delete' === $delete_or_renumber && is_callable( array( $document, 'delete' ) ) ) {
-					$document->delete();
+	public function ajax_renumber_or_delete_documents() {
+		check_ajax_referer( 'wpo_wcpdf_number_tools_nonce', 'security' );
+	
+		$from_date          = date_i18n( 'Y-m-d', strtotime( $_POST['date_from'] ) );
+		$to_date            = date_i18n( 'Y-m-d', strtotime( $_POST['date_to'] ) );
+		$document_type      = esc_attr( $_POST['document_type'] );
+		$document_types     = ( 'all' !== $document_type ) ? array( $document_type ) : array();
+		$document_title     = ( 'all' !== $document_type ) ? ' ' . ucwords( str_replace( '-', ' ', $document_type ) ) . ' ' : ' ';
+		$page_count         = absint( $_POST['page_count'] );
+		$document_count     = absint( $_POST['document_count'] );
+		$delete_or_renumber = esc_attr( $_POST['delete_or_renumber'] );
+		$message            = ( 'delete' === $delete_or_renumber ) ? $document_title . __( 'documents deleted.', 'woocommerce-pdf-ips-number-tools' ) : $document_title . __( 'documents renumbered.', 'woocommerce-pdf-ips-number-tools' );
+		$finished           = false;
+	
+		$args = array(
+			'return'         => 'ids',
+			'type'           => 'shop_order',
+			'limit'          => -1,
+			'order'          => 'ASC',
+			'paginate'       => true,
+			'posts_per_page' => 50,
+			'page'           => $page_count,
+			'date_created'   => $from_date . '...' . $to_date,
+		);
+	
+		$results   = wc_get_orders( $args );
+		$order_ids = $results->orders;
+		
+		if ( ! empty( $order_ids ) && ! empty( $document_type ) ) {
+			foreach ( $order_ids as $order_id ) {
+				$order = wc_get_order( $order_id );
+				
+				if ( empty( $order ) ) {
+					continue;
 				}
-				$document_count++;
+				
+				if ( 'all' === $document_type ) {
+					$documents = WPO_WCPDF()->documents->get_documents( 'all' );
+					foreach ( $documents as $document ) {
+						$document_types[] = $document->get_type();
+					}
+				}
+				
+				foreach ( $document_types as $type ) {
+					$document = wcpdf_get_document( $type, $order );
+					$return   = $this->renumber_or_delete_document( $document, $delete_or_renumber );
+					if ( $return ) {
+						$document_count++;
+					}
+				}
+			}
+			$page_count++;
+	
+		// no more order IDs
+		} else {
+			$finished = true;
+		}
+	
+		$response = array(
+			'finished'      => $finished,
+			'pageCount'     => $page_count,
+			'documentCount' => $document_count,
+			'message'       => $message,
+		);
+		
+		wp_send_json_success( $response );	
+			
+		wp_die(); // this is required to terminate immediately and return a proper response
+	}
+	
+	public function renumber_or_delete_document( $document, $delete_or_renumber ) {
+		$return = false;
+		
+		if ( $document && $document->exists() ) {
+			switch ( $delete_or_renumber ) {
+				case 'renumber':
+					if ( is_callable( array( $document, 'init_number' ) ) ) {
+						$document->init_number();
+						$document->save();
+						$return = true;
+					}
+					break;
+				case 'delete':
+					if ( is_callable( array( $document, 'delete' ) ) ) {
+						$document->delete();
+						$return = true;
+					}
+					break;
+				default:
+					break;
 			}
 		}
-		$page_count++;
-
-	// no more order IDs
-	} else {
-		$finished = true;
-	}
-
-	$response = array(
-		'finished'      => $finished,
-		'pageCount'     => $page_count,
-		'documentCount' => $document_count,
-		'message'       => $message,
-	);
-	
-	wp_send_json_success( $response );	
 		
-	wp_die(); // this is required to terminate immediately and return a proper response
+		return $return;
+	}
+	
 }
 
 endif; // class_exists
