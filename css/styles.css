@@ -12,17 +12,16 @@ td.column-number {
 	font-weight:normal;
 }
 
+.wpo-wcpdf-number-tools .tool {
+	margin-top: 2em;
+}
+
 .wpo-wcpdf-number-tools .renumber-invoices,
 .wpo-wcpdf-number-tools .delete-invoices { 
 	border-bottom:1px solid #ccc;
 	padding:2em 2em 2em 0;
 	margin-bottom:1em;
 	width:70%;
-}
-
-.wpo-wcpdf-number-tools strong {
-	color:#a00;
-	font-weight:bold;
 }
 
 .wpo-wcpdf-number-tools strong.name {

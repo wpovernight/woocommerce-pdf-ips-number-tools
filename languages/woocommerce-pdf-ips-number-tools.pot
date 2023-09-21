@@ -1,15 +1,15 @@
-# Copyright (C) 2023 Ewout Fernhout
+# Copyright (C) 2023 WP Overnight
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce - Number Tools 2.4.1\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce - Number Tools 2.4.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-ips-number-tools\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-03-01T18:34:22+00:00\n"
+"POT-Creation-Date: 2023-09-19T10:03:45+02:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.7.1\n"
 "X-Domain: woocommerce-pdf-ips-number-tools\n"
@@ -24,11 +24,11 @@ msgid "https://www.wpovernight.com/"
 msgstr ""
 
 #. Description of the plugin
-msgid "Provides debugging tools for invoice numbers"
+msgid "Provides debugging tools for document numbers"
 msgstr ""
 
 #. Author of the plugin
-msgid "Ewout Fernhout"
+msgid "WP Overnight"
 msgstr ""
 
 #: number-store-list-table.php:105
@@ -103,60 +103,77 @@ msgstr ""
 msgid "Please select a number store!"
 msgstr ""
 
-#: woocommerce-pdf-ips-number-tools.php:362
-msgid "Renumber existing PDF invoices"
+#: woocommerce-pdf-ips-number-tools.php:282
+msgid "Please select a document type"
 msgstr ""
 
-#: woocommerce-pdf-ips-number-tools.php:363
-msgid "This tool will renumber existing PDF invoices within the selected order date range, while keeping the assigned invoice date."
+#: woocommerce-pdf-ips-number-tools.php:376
+msgid "<strong>IMPORTANT:</strong> Create a backup before using this tools, the actions they performs are irreversible!"
 msgstr ""
 
-#: woocommerce-pdf-ips-number-tools.php:363
-msgid "Set the \"next invoice number\" setting (WooCommerce > PDF Invoices > Documents > Invoice) to the number you want to use for the first invoice."
-msgstr ""
-
-#: woocommerce-pdf-ips-number-tools.php:365
 #: woocommerce-pdf-ips-number-tools.php:381
+msgid "Renumber existing documents"
+msgstr ""
+
+#: woocommerce-pdf-ips-number-tools.php:383
+msgid "This tool will renumber existing documents within the selected order date range, while keeping the assigned document date."
+msgstr ""
+
+#: woocommerce-pdf-ips-number-tools.php:384
+msgid "Set the \"next document number\" setting (WooCommerce > PDF Invoices > Documents > Select document) to the number you want to use for the first document."
+msgstr ""
+
+#: woocommerce-pdf-ips-number-tools.php:387
+#: woocommerce-pdf-ips-number-tools.php:410
+msgid "Document type:"
+msgstr ""
+
+#: woocommerce-pdf-ips-number-tools.php:389
+#: woocommerce-pdf-ips-number-tools.php:412
+msgid "Select"
+msgstr ""
+
+#: woocommerce-pdf-ips-number-tools.php:396
+#: woocommerce-pdf-ips-number-tools.php:420
 msgid "From:"
 msgstr ""
 
-#: woocommerce-pdf-ips-number-tools.php:366
-#: woocommerce-pdf-ips-number-tools.php:370
-#: woocommerce-pdf-ips-number-tools.php:382
-#: woocommerce-pdf-ips-number-tools.php:386
+#: woocommerce-pdf-ips-number-tools.php:397
+#: woocommerce-pdf-ips-number-tools.php:401
+#: woocommerce-pdf-ips-number-tools.php:421
+#: woocommerce-pdf-ips-number-tools.php:425
 msgid "(as: yyyy-mm-dd)"
 msgstr ""
 
-#: woocommerce-pdf-ips-number-tools.php:369
-#: woocommerce-pdf-ips-number-tools.php:385
+#: woocommerce-pdf-ips-number-tools.php:400
+#: woocommerce-pdf-ips-number-tools.php:424
 msgid "To:"
 msgstr ""
 
-#: woocommerce-pdf-ips-number-tools.php:372
-msgid "Renumber invoices"
+#: woocommerce-pdf-ips-number-tools.php:403
+msgid "Renumber documents"
 msgstr ""
 
-#: woocommerce-pdf-ips-number-tools.php:374
-#: woocommerce-pdf-ips-number-tools.php:390
-msgid "<strong>IMPORTANT:</strong> Create a backup before using this tool, the actions it performs are irreversible!"
-msgstr ""
-
-#: woocommerce-pdf-ips-number-tools.php:378
-msgid "Delete existing PDF invoices"
-msgstr ""
-
-#: woocommerce-pdf-ips-number-tools.php:379
-msgid "This tool will delete existing PDF invoices within the selected order date range."
-msgstr ""
-
-#: woocommerce-pdf-ips-number-tools.php:388
-msgid "Delete invoices"
+#: woocommerce-pdf-ips-number-tools.php:407
+msgid "Delete existing documents"
 msgstr ""
 
 #: woocommerce-pdf-ips-number-tools.php:408
-msgid "invoices deleted."
+msgid "This tool will delete existing documents within the selected order date range."
 msgstr ""
 
-#: woocommerce-pdf-ips-number-tools.php:408
-msgid "invoices renumbered."
+#: woocommerce-pdf-ips-number-tools.php:416
+msgid "All"
+msgstr ""
+
+#: woocommerce-pdf-ips-number-tools.php:427
+msgid "Delete documents"
+msgstr ""
+
+#: woocommerce-pdf-ips-number-tools.php:446
+msgid "documents deleted."
+msgstr ""
+
+#: woocommerce-pdf-ips-number-tools.php:446
+msgid "documents renumbered."
 msgstr ""
