@@ -511,8 +511,14 @@ class WPO_WCPDF_Number_Tools {
 				case 'renumber':
 					if ( is_callable( array( $document, 'init_number' ) ) ) {
 						$document->init_number();
-						$document->save();
 						$return = true;
+					} elseif ( 'packing-slip' === $document->get_type() && is_callable( array( WPO_WCPDF_Pro()->functions, 'init_packing_slip_number' ) ) ) {
+						WPO_WCPDF_Pro()->functions->init_packing_slip_number( $document );
+						$return = true;
+					}
+					
+					if ( $return ) {
+						$document->save();
 					}
 					break;
 				case 'delete':
