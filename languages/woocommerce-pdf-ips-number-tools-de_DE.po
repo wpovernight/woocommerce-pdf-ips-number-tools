@@ -1,0 +1,199 @@
+# Copyright (C) 2021 Ewout Fernhout
+# This file is distributed under the GPLv2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: WooCommerce PDF Invoices & Packing Slips number tools "
+"2.2.1\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-"
+"ips-number-tools\n"
+"POT-Creation-Date: 2023-03-01T18:34:22+00:00\n"
+"PO-Revision-Date: 2023-09-24 00:10-0500\n"
+"Last-Translator: WP Overnight <support@wpovernight.com>\n"
+"Language-Team: \n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.3.2\n"
+"X-Domain: woocommerce-pdf-ips-number-tools\n"
+
+#. Plugin Name of the plugin
+#| msgid "WooCommerce PDF Invoices & Packing Slips Number Tools"
+msgid "PDF Invoices & Packing Slips for WooCommerce - Number Tools"
+msgstr "PDF Invoices & Packing Slips for WooCommerce - Number Tools"
+
+#. Plugin URI of the plugin
+#. Author URI of the plugin
+msgid "https://www.wpovernight.com/"
+msgstr "https://www.wpovernight.com/"
+
+#. Description of the plugin
+msgid "Provides debugging tools for invoice numbers"
+msgstr "Bietet Debugging-Tools für Rechnungsnummern"
+
+#. Author of the plugin
+msgid "Ewout Fernhout"
+msgstr "Ewout Fernhout"
+
+#: number-store-list-table.php:105
+msgid "Refund:"
+msgstr "Rückerstattung:"
+
+#: number-store-list-table.php:121
+msgid "Unknown"
+msgstr "Unbekannt"
+
+#: number-store-list-table.php:144
+msgid "Number"
+msgstr "Nummer"
+
+#: number-store-list-table.php:145
+msgid "Calculated"
+msgstr "Berechnet"
+
+#: number-store-list-table.php:146
+msgid "Date"
+msgstr "Datum"
+
+#: number-store-list-table.php:147
+msgid "Order"
+msgstr "Bestellung"
+
+#: number-store-list-table.php:148
+msgid "Order Status"
+msgstr "Bestellstatus"
+
+#: woocommerce-pdf-ips-number-tools.php:70
+msgid ""
+"The <strong>Number Tools</strong> extension for <strong>PDF Invoices & "
+"Packing Slips for WooCommerce</strong> has been active for more than a week "
+"now. If you don't plan to use it, we recommend that you remove it from your "
+"site!"
+msgstr ""
+"Die <strong>Nummer Werkzeuge-</strong> Erweiterung für <strong>PDF-"
+"Rechnungen und Lieferscheine für WooCommerce</strong> ist nun seit mehr als "
+"einer Woche aktiv. Wenn Sie nicht vorhaben, es zu verwenden, empfehlen wir "
+"Ihnen, es von Ihrer Website zu entfernen!"
+
+#: woocommerce-pdf-ips-number-tools.php:81
+msgid "Hide this message"
+msgstr "Diese Nachricht ausblenden"
+
+#: woocommerce-pdf-ips-number-tools.php:119
+msgid "Number Tools"
+msgstr "Nummer Werkzeuge"
+
+#: woocommerce-pdf-ips-number-tools.php:131
+msgid "Document Numbers"
+msgstr "Dokumentnummern"
+
+#: woocommerce-pdf-ips-number-tools.php:132
+msgid "Tools"
+msgstr "Werkzeuge"
+
+#: woocommerce-pdf-ips-number-tools.php:181
+msgid "Choose a number store"
+msgstr "Wählen Sie einen Nummernspeicher"
+
+#: woocommerce-pdf-ips-number-tools.php:185
+msgid "Select…"
+msgstr "Auswählen…"
+
+#: woocommerce-pdf-ips-number-tools.php:201
+msgid "View"
+msgstr "Anzeigen"
+
+#: woocommerce-pdf-ips-number-tools.php:209
+msgid ""
+"Below is a list of all the document numbers generated since the last reset "
+"(which happens when you set the \"next {document name} number\" value in the "
+"settings). Numbers may have been assigned to orders before this."
+msgstr ""
+"Nachfolgend finden Sie eine Liste aller Belegnummern, die seit dem letzten "
+"Zurücksetzen (das geschieht, wenn Sie in den Einstellungen den Wert "
+"\"nächste {Belegname} Nummer\" festlegen) erzeugt wurden. Es kann sein, dass "
+"die Nummern schon vorher an Aufträge vergeben wurden."
+
+#: woocommerce-pdf-ips-number-tools.php:218
+msgid "Search number"
+msgstr "Suchnummer"
+
+#: woocommerce-pdf-ips-number-tools.php:228
+msgid "Please select a number store!"
+msgstr "Bitte wählen Sie einen Nummernspiecher aus!"
+
+#: woocommerce-pdf-ips-number-tools.php:362
+msgid "Renumber existing PDF invoices"
+msgstr "Nummerieren Sie bestehende PDF-Rechnungen neu"
+
+#: woocommerce-pdf-ips-number-tools.php:363
+msgid ""
+"This tool will renumber existing PDF invoices within the selected order date "
+"range, while keeping the assigned invoice date."
+msgstr ""
+"Dieses Tool löscht vorhandene PDF-Rechnungen innerhalb des ausgewählten "
+"Bestellzeitraums."
+
+#: woocommerce-pdf-ips-number-tools.php:363
+msgid ""
+"Set the \"next invoice number\" setting (WooCommerce > PDF Invoices > "
+"Documents > Invoice) to the number you want to use for the first invoice."
+msgstr ""
+"Setzen Sie die Einstellung \"nächste Rechnungsnummer\" (WooCommerce > PDF-"
+"Rechnungen > Dokumente > Rechnung) auf die Nummer, die Sie für die erste "
+"Rechnung verwenden möchten."
+
+#: woocommerce-pdf-ips-number-tools.php:365
+#: woocommerce-pdf-ips-number-tools.php:381
+msgid "From:"
+msgstr "Von:"
+
+#: woocommerce-pdf-ips-number-tools.php:366
+#: woocommerce-pdf-ips-number-tools.php:370
+#: woocommerce-pdf-ips-number-tools.php:382
+#: woocommerce-pdf-ips-number-tools.php:386
+msgid "(as: yyyy-mm-dd)"
+msgstr "(als: jjjj-mm-tt)"
+
+#: woocommerce-pdf-ips-number-tools.php:369
+#: woocommerce-pdf-ips-number-tools.php:385
+msgid "To:"
+msgstr "Bis:"
+
+#: woocommerce-pdf-ips-number-tools.php:372
+msgid "Renumber invoices"
+msgstr "Rechnungen neu nummerieren"
+
+#: woocommerce-pdf-ips-number-tools.php:374
+#: woocommerce-pdf-ips-number-tools.php:390
+msgid ""
+"<strong>IMPORTANT:</strong> Create a backup before using this tool, the "
+"actions it performs are irreversible!"
+msgstr ""
+"<strong>WICHTIG:</strong> Erstellen Sie ein Backup, bevor Sie dieses Tool "
+"verwenden. Die von ihm ausgeführten Aktionen sind irreversibel!"
+
+#: woocommerce-pdf-ips-number-tools.php:378
+msgid "Delete existing PDF invoices"
+msgstr "Löschen Sie vorhandene PDF-Rechnungen"
+
+#: woocommerce-pdf-ips-number-tools.php:379
+msgid ""
+"This tool will delete existing PDF invoices within the selected order date "
+"range."
+msgstr ""
+"Dieses Tool löscht vorhandene PDF-Rechnungen innerhalb des ausgewählten "
+"Bestelldatumsbereichs."
+
+#: woocommerce-pdf-ips-number-tools.php:388
+msgid "Delete invoices"
+msgstr "Rechnungen löschen"
+
+#: woocommerce-pdf-ips-number-tools.php:408
+msgid "invoices deleted."
+msgstr "Rechnungen gelöscht."
+
+#: woocommerce-pdf-ips-number-tools.php:408
+msgid "invoices renumbered."
+msgstr "Rechnungen neu nummeriert."
