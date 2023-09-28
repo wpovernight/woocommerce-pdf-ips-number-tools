@@ -72,6 +72,7 @@ class WPO_WCPDF_Number_Tools_List_Table extends \WP_List_Table {
 		<?php
 	}
 
+	
 	/**
 	 * This function renders most of the columns in the list table.
 	 *
@@ -121,6 +122,15 @@ class WPO_WCPDF_Number_Tools_List_Table extends \WP_List_Table {
 					$value = '<strong>' . __('Unknown', 'woocommerce-pdf-ips-number-tools') .'</strong>';
 				}
 				break;
+			case 'date_display' :
+				$order = $this->get_base_order( wc_get_order( $item->order_id ) );
+				if ( ! empty( $order ) ) {
+					$invoice = wcpdf_get_document( 'invoice', $order );
+				 	$value = $invoice->document_display_date();
+				} else {
+					$value = '<strong>' . __('Unknown', 'woocommerce-pdf-ips-number-tools') .'</strong>';
+				}
+				break;
 			default:
 				$value = isset( $item->$column_name )
 					? $item->$column_name
@@ -149,6 +159,12 @@ class WPO_WCPDF_Number_Tools_List_Table extends \WP_List_Table {
 		);
 		if ( ! isset( WPO_WCPDF()->settings->debug_settings['calculate_document_numbers'] ) ) {
 			unset( $columns['calculated_number'] );
+		}
+
+		if( ! isset( $_GET['table_name'] ) ||
+			( isset( $_GET['table_name'] ) && 'wp_wcpdf_invoice_number' === $_GET['table_name'] )
+		) {
+			$columns['date_display'] =  __( 'Display Invoice Date', 'woocommerce-pdf-ips-number-tools' );
 		}
 		return apply_filters( 'wpo_wcpdf_number_tools_columns', $columns );
 	}
